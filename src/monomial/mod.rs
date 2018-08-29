@@ -1,13 +1,13 @@
+use num_traits::*;
 use std::cmp::Ordering;
 use std::ops::Mul;
 
 /// Monomial multiplicative monoid, endowed with monoidal ordering.
 /// A type must satisfy the axioms of ordered free commutative monoids;
 /// I.e. a * b = b * a, a * (b * c) = (a * b) * c, 1 <= a, and "a <= b implies a * c <= b * c".
-pub trait Monomial: Ord + Clone + Sized + Mul<Output = Self> {
+pub trait Monomial: Ord + One + Copy {
     type Var;
 
-    fn one() -> Self;
     fn variables() -> Vec<Self::Var>;
     fn var(var: &Self::Var) -> Option<Self>;
     fn exponent(&self, var: &Self::Var) -> Option<usize>;
@@ -34,12 +34,18 @@ impl Mul for Power {
     }
 }
 
-impl Monomial for Power {
-    type Var = ();
-
+impl One for Power {
     fn one() -> Power {
         Power(0)
     }
+
+    fn is_one(&self) -> bool {
+        self.0.is_one()
+    }
+}
+
+impl Monomial for Power {
+    type Var = ();
 
     fn variables() -> Vec<()> {
         vec![()]
@@ -83,12 +89,14 @@ impl Ord for Lex2 {
     }
 }
 
-impl Monomial for Lex2 {
-    type Var = bool;
-
+impl One for Lex2 {
     fn one() -> Lex2 {
         Lex2([0, 0])
     }
+}
+
+impl Monomial for Lex2 {
+    type Var = bool;
 
     fn variables() -> Vec<bool> {
         vec![false, true]
