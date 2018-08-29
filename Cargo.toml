@@ -1,0 +1,18 @@
+[package]
+name = "groebner-rs"
+version = "0.1.0"
+authors = ["Hiromi ISHII <konn.jinro@gmail.com>"]
+description = "Computer algebra algorithms, mainly focusing on Groebner basis, implemented in Rust"
+repository = "https://github.com/konn/groebner-rs.git"
+readme = "README.md"
+
+keywords = [
+  "Math",
+  "Groebner Basis",
+  "Computer Algebra",
+  "Polynomials"
+]
+
+[dependencies]
+"num"        = "0.2.0"
+"num-traits" = "0.2.0"
