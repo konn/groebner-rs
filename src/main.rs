@@ -1,13 +1,11 @@
 extern crate groebner_rs;
 extern crate num_traits;
-use groebner_rs::polynomial;
 use groebner_rs::polynomial::Unipol;
 use groebner_rs::ring::Semiring;
 use num_traits::One;
 
 fn main() {
     println!("2 ^ 10 = {}", 2_usize.pow(10));
-    use One;
     use Unipol;
     let f: Unipol<isize> = Unipol::x() + One::one();
     let g: Unipol<isize> = Unipol::x() - One::one();
