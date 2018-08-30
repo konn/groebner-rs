@@ -4,6 +4,7 @@ use ring::*;
 use scalar::*;
 use std::ops::*;
 
+// Buchberger algorithm with primarity and syzygy criterion.
 pub fn buchberger<P: Polynomial>(mut ideal: Vec<P>) -> Vec<P>
 where
     Scalar<<P as Polynomial>::Coeff>: Mul<P, Output = P>,
