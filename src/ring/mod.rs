@@ -1,3 +1,5 @@
+use num_integer::*;
+use num_rational::*;
 use num_traits::*;
 use std::iter;
 use std::ops::*;
@@ -41,3 +43,22 @@ impl Ring for isize {
         i
     }
 }
+
+pub trait Field: Ring + Div<Self, Output = Self> {
+    fn try_div(self, other: Self) -> Option<Self> {
+        if other.is_zero() {
+            None
+        } else {
+            Some(self / other)
+        }
+    }
+
+    fn recip(self) -> Self {
+        Self::one() / self
+    }
+}
+
+impl<I: NumAssign + Ring + Integer> Semiring for Ratio<I> {}
+
+impl<I: NumAssign + Ring + Integer> Ring for Ratio<I> {}
+impl<I: NumAssign + Ring + Integer> Field for Ratio<I> {}

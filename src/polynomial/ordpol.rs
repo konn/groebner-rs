@@ -155,3 +155,25 @@ impl<'a, R: Ring, X: Monomial> Polynomial<'a> for Ordpol<R, X> {
 }
 
 lift_nums_to_ref!(impl for Ordpol<R, X> where R: Ring, X: Monomial);
+
+impl<K: Field, X: Monomial> Div for Ordpol<K, X> {
+    type Output = Ordpol<K, X>;
+    #[inline]
+    fn div(self, other: Self) -> Self {
+        self.div_mod(other).0
+    }
+}
+
+impl<K: Field, X: Monomial> Rem for Ordpol<K, X> {
+    type Output = Ordpol<K, X>;
+
+    #[inline]
+    fn rem(self, other: Self) -> Self {
+        self.div_mod(other).1
+    }
+}
+
+derive_assign_with!(impl DivAssign, div_assign as Div, div for Ordpol<K, X> where K: Field, X: Monomial);
+derive_assign_with!(impl RemAssign, rem_assign as Rem, rem for Ordpol<K, X> where K: Field, X: Monomial);
+lift_binop_to_ref!(impl Div, div for Ordpol<K, X> where K: Field, X: Monomial);
+lift_binop_to_ref!(impl Rem, rem for Ordpol<K, X> where K: Field, X: Monomial);

@@ -94,6 +94,48 @@ pub mod polynomial {
                 })
                 .fold(T::zero(), |a, b| a + b)
         }
+
+        fn spol(self, other: Self) -> Self
+        where
+            Self::Coeff: Field,
+        {
+            let (mcx, f) = self.split_lead_term();
+            let (mx, cx) = mcx.unwrap();
+            let (mcy, g) = other.split_lead_term();
+            let (my, cy) = mcy.unwrap();
+            let m = mx.clone().lcm(my.clone());
+            let mx: Self::Monomial = (m / mx).unwrap();
+            let my: Self::Monomial = (m / my).unwrap();
+            let f = Scalar(cx.clone().recip()) * Self::from_monomial(mx) * f;
+            let g = Scalar(cy.clone().recip()) * Self::from_monomial(my) * g;
+
+            f - g
+        }
+
+        fn div_mod(self, g: Self) -> (Self, Self)
+        where
+            Self::Coeff: Field,
+        {
+            let mut r = self;
+            let mut q = Self::zero();
+            let (md, g) = g.split_lead_term();
+            let (d, c) = md.unwrap();
+            while let Some((lt_f, lc_f)) = r.pop_lead_term() {
+                match lt_f / d {
+                    None => {
+                        r += Scalar(lc_f) * Self::from_monomial(lt_f);
+                        break;
+                    }
+                    Some(lt_f) => {
+                        let k = c.clone() / lc_f;
+                        let coe = Scalar(k) * Self::from_monomial(lt_f);
+                        q += coe.clone();
+                        r -= coe * g.clone();
+                    }
+                }
+            }
+            (q, r)
+        }
     }
 
     pub mod unipol;
@@ -101,4 +143,5 @@ pub mod polynomial {
 
     pub mod ordpol;
     pub use self::ordpol::*;
+
 }

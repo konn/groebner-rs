@@ -175,6 +175,24 @@ impl<'a, R: Ring + 'a> Polynomial<'a> for Unipol<R> {
         }
     }
 }
+
+impl<R: Field> Div for Unipol<R> {
+    type Output = Unipol<R>;
+    #[inline]
+    fn div(self, other: Self) -> Self {
+        self.div_mod(other).0
+    }
+}
+
+impl<R: Field> Rem for Unipol<R> {
+    type Output = Unipol<R>;
+
+    #[inline]
+    fn rem(self, other: Self) -> Self {
+        self.div_mod(other).1
+    }
 }
 
 lift_nums_to_ref!(impl for Unipol<R> where R: Ring);
+derive_assign_with!(impl DivAssign, div_assign as Div, div for Unipol<K> where K: Field);
+derive_assign_with!(impl RemAssign, rem_assign as Rem, rem for Unipol<K> where K: Field);
