@@ -26,6 +26,10 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
             .collect()
     }
 
+    fn divides(&self, other: &Self) -> bool {
+        (*other / *self).is_some()
+    }
+
     fn lcm(self, other: Self) -> Self {
         let vec: Vec<_> = self
             .exponents()
@@ -174,7 +178,7 @@ impl Mul for Grevlex2 {
 impl PartialOrd for Grevlex2 {
     fn partial_cmp(&self, Grevlex2([ref x2, ref y2]): &Grevlex2) -> Option<Ordering> {
         let Grevlex2([x1, y1]) = self;
-        Some((x1+y1).cmp(&(x2 + y2)).then(y2.cmp(y1).then(x2.cmp(x1))))
+        Some((x1 + y1).cmp(&(x2 + y2)).then(y2.cmp(y1).then(x2.cmp(x1))))
     }
 }
 
@@ -211,7 +215,11 @@ impl Monomial for Grevlex2 {
     }
 
     fn var(b: &bool) -> Option<Grevlex2> {
-        Some(if *b { Grevlex2([0, 1]) } else { Grevlex2([1, 0]) })
+        Some(if *b {
+            Grevlex2([0, 1])
+        } else {
+            Grevlex2([1, 0])
+        })
     }
 
     fn exponent(&self, p: &bool) -> Option<usize> {
