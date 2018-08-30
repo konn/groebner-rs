@@ -179,4 +179,7 @@ pub mod polynomial {
     pub mod ordpol;
     pub use self::ordpol::*;
 
+    pub mod groebner;
+    pub use self::groebner::*;
+
 }
