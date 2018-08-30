@@ -26,6 +26,10 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
             .collect()
     }
 
+    fn total_deg(&self) -> usize {
+        self.exponents().iter().map(|(_, n)| n).sum()
+    }
+
     fn divides(&self, other: &Self) -> bool {
         (*other / *self).is_some()
     }

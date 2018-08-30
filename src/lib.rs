@@ -33,8 +33,8 @@ pub mod polynomial {
         // type Term: Iterator<Item = (Self::Monomial, &Self::Coeff)>;
         // type TermMut: Iterator<(Self::Monomial, &'a mut Self::Coeff)>
 
-        fn lead_term(& self) -> Option<(Self::Monomial, & Self::Coeff)>;
-        fn lead_monom(& self) -> Option<Self::Monomial> {
+        fn lead_term(&self) -> Option<(Self::Monomial, &Self::Coeff)>;
+        fn lead_monom(&self) -> Option<Self::Monomial> {
             self.lead_term().map(|a| a.0)
         }
         fn lead_coeff(&self) -> Option<&Self::Coeff> {
@@ -48,7 +48,16 @@ pub mod polynomial {
 
         fn pop_lead_term(&mut self) -> Option<(Self::Monomial, Self::Coeff)>;
 
-        fn terms(& self) -> BTreeMap<Self::Monomial, & Self::Coeff>;
+        fn terms(&self) -> BTreeMap<Self::Monomial, &Self::Coeff>;
+
+        fn total_deg(&self) -> usize {
+            self.terms()
+                .keys()
+                .cloned()
+                .map(|a| a.total_deg())
+                .max()
+                .unwrap_or(0)
+        }
 
         fn var(v: <Self::Monomial as Monomial>::Var) -> Option<Self> {
             match <Self::Monomial as Monomial>::var(&v) {
@@ -80,7 +89,7 @@ pub mod polynomial {
                 .fold(Self::zero(), Add::add)
         }
 
-        fn lift_map<T, F>(& self, map: F) -> T
+        fn lift_map<T, F>(&self, map: F) -> T
         where
             T: Mul<Self::Coeff, Output = T> + Ring,
             F: Fn(&<Self::Monomial as Monomial>::Var) -> T,
