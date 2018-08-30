@@ -1,5 +1,8 @@
 extern crate num_traits;
 
+#[macro_use]
+mod macros;
+
 pub mod monomial;
 pub mod ring;
 pub mod scalar;
@@ -73,4 +76,7 @@ pub mod polynomial {
 
     pub mod unipol;
     pub use self::unipol::*;
+
+    pub mod ordpol;
+    pub use self::ordpol::*;
 }

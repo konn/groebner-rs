@@ -6,7 +6,7 @@ use std::ops::Mul;
 /// A type must satisfy the axioms of ordered free commutative monoids;
 /// I.e. a * b = b * a, a * (b * c) = (a * b) * c, 1 <= a, and "a <= b implies a * c <= b * c".
 pub trait Monomial: Ord + One + Copy {
-    type Var;
+    type Var: Copy;
 
     fn variables() -> Vec<Self::Var>;
     fn var(var: &Self::Var) -> Option<Self>;

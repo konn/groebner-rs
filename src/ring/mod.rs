@@ -2,7 +2,7 @@ use num_traits::*;
 use std::iter;
 use std::ops::*;
 
-pub trait Semiring: Clone + Eq + Zero + One {
+pub trait Semiring: Clone + Eq + Zero + One + AddAssign<Self> + MulAssign<Self> {
     fn from_nat(i: usize) -> Self {
         iter::repeat(Self::one())
             .take(i)
@@ -14,7 +14,7 @@ pub trait Semiring: Clone + Eq + Zero + One {
     }
 }
 
-pub trait Ring: Semiring + Sub<Output = Self> + Neg<Output = Self> {
+pub trait Ring: Semiring + Sub<Output = Self> + Neg<Output = Self> + SubAssign<Self> {
     fn from_int(n: isize) -> Self {
         if n < 0 {
             -Self::from_nat(n.abs() as usize)

@@ -1,6 +1,6 @@
 use num_traits::*;
 use ring::*;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::*;
 
 #[derive(Debug, Clone, Ord, Eq, PartialOrd, PartialEq)]
 pub struct Scalar<T>(pub T);
@@ -63,7 +63,7 @@ impl<T: Sub<Output = T>> Sub for Scalar<T> {
     }
 }
 
-impl<T: Semiring> Semiring for Scalar<T> {
+impl<T: Ring> Semiring for Scalar<T> {
     fn from_nat(n: usize) -> Self {
         Scalar(<T as Semiring>::from_nat(n))
     }
@@ -74,3 +74,7 @@ impl<T: Ring> Ring for Scalar<T> {
         Scalar(T::from_int(n))
     }
 }
+
+derive_assign_with!(impl AddAssign, add_assign as Add, add for Scalar<T> where T: Ring);
+derive_assign_with!(impl SubAssign, sub_assign as Sub, sub for Scalar<T> where T: Ring);
+derive_assign_with!(impl MulAssign, mul_assign as Mul, mul for Scalar<T> where T: Ring);

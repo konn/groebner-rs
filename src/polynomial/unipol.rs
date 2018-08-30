@@ -4,7 +4,7 @@ use polynomial::Polynomial;
 use ring::*;
 use scalar::*;
 use std::collections::BTreeMap;
-use std::ops::{Add, Mul, Neg, Sub};
+use std::ops::*;
 
 use std::iter;
 
@@ -69,7 +69,7 @@ impl<R: Ring> Sub for Unipol<R> {
     }
 }
 
-impl<R: Semiring> Mul for Unipol<R> {
+impl<R: Ring> Mul for Unipol<R> {
     type Output = Unipol<R>;
     fn mul(self, Unipol { coeffs: rs }: Unipol<R>) -> Unipol<R> {
         let Unipol { coeffs: ls } = self;
@@ -96,7 +96,7 @@ impl<R: Zero + Clone> Zero for Unipol<R> {
     }
 }
 
-impl<R: Semiring> One for Unipol<R> {
+impl<R: Ring> One for Unipol<R> {
     fn one() -> Self {
         Unipol {
             coeffs: vec![R::one()],
@@ -104,7 +104,7 @@ impl<R: Semiring> One for Unipol<R> {
     }
 }
 
-impl<R: Semiring> Semiring for Unipol<R> {
+impl<R: Ring> Semiring for Unipol<R> {
     fn from_nat(n: usize) -> Self {
         Unipol {
             coeffs: vec![R::from_nat(n)],
@@ -146,3 +146,5 @@ impl<'a, R: Ring + 'a> Polynomial<'a> for Unipol<R> {
             .collect()
     }
 }
+
+lift_nums_to_ref!(impl for Unipol<R> where R: Ring);
