@@ -1,4 +1,5 @@
 use polynomial::Polynomial;
+use monomial::Monomial;
 use ring::*;
 use scalar::*;
 use std::ops::*;
@@ -13,6 +14,10 @@ where
     let mut n = ideal.len();
     while let Some((i, j)) = pairs.pop() {
         let (f, g) = (ideal[i].clone(), ideal[j].clone());
+        let (lt_f, lt_g) = (f.lead_monom().unwrap(), g.lead_monom().unwrap());
+        if lt_f.lcm(lt_g) == lt_f * lt_g {
+            continue;
+        }
         let (_, s) = f.spol(g).div_mod_polys(ideal.clone());
         if !s.is_zero() {
             ideal.push(s);
