@@ -69,3 +69,6 @@ macro_rules! lift_nums_to_ref {
         lift_unaop_to_ref!(impl Neg, neg for $t where $($bd_type : $bound),*);
     };
 }
+
+#[macro_use]
+pub mod monomial;
