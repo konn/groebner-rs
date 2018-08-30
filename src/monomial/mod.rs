@@ -1,11 +1,11 @@
 use num_traits::*;
 use std::cmp::Ordering;
-use std::ops::Mul;
+use std::ops::*;
 
 /// Monomial multiplicative monoid, endowed with monoidal ordering.
 /// A type must satisfy the axioms of ordered free commutative monoids;
 /// I.e. a * b = b * a, a * (b * c) = (a * b) * c, 1 <= a, and "a <= b implies a * c <= b * c".
-pub trait Monomial: Ord + One + Copy {
+pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
     type Var: Copy;
 
     fn variables() -> Vec<Self::Var>;
@@ -19,6 +19,16 @@ pub trait Monomial: Ord + One + Copy {
                 (v, c)
             })
             .collect()
+    }
+
+    fn lcm(self, other: Self) -> Self {
+        let vec: Vec<_> = self
+            .exponents()
+            .into_iter()
+            .zip(other.exponents().into_iter())
+            .map(|((v, m), (_, n))| (v, m.max(n)))
+            .collect();
+        Self::from_exponents(&vec)
     }
 }
 
@@ -64,6 +74,18 @@ impl Monomial for Power {
     }
 }
 
+impl Div for Power {
+    type Output = Option<Self>;
+
+    fn div(self, other: Power) -> Option<Self> {
+        if self.0 < other.0 {
+            None
+        } else {
+            Some(Power(self.0 - other.0))
+        }
+    }
+}
+
 #[derive(PartialEq, Eq, Copy, Clone, Debug)]
 pub struct Lex2(pub [usize; 2]);
 
@@ -92,6 +114,19 @@ impl Ord for Lex2 {
 impl One for Lex2 {
     fn one() -> Lex2 {
         Lex2([0, 0])
+    }
+}
+
+impl Div for Lex2 {
+    type Output = Option<Lex2>;
+
+    fn div(self, Lex2([x2, y2]): Lex2) -> Option<Lex2> {
+        let Lex2([x1, y1]) = self;
+        if x1 >= x2 && y1 >= y2 {
+            Some(Lex2([x1 - x2, y1 - y2]))
+        } else {
+            None
+        }
     }
 }
 
