@@ -24,7 +24,7 @@ pub mod polynomial {
 
     /// Trait corresponding to polynomials.
     /// Minimal implementation: `lead_term`, `split_lead_term`, `terms`, (`var` or `from_terms`) and `lift_map`
-    pub trait Polynomial<'a>: Ring
+    pub trait Polynomial: Ring
     where
         Scalar<Self::Coeff>: Mul<Self, Output = Self>,
     {
@@ -33,11 +33,11 @@ pub mod polynomial {
         // type Term: Iterator<Item = (Self::Monomial, &Self::Coeff)>;
         // type TermMut: Iterator<(Self::Monomial, &'a mut Self::Coeff)>
 
-        fn lead_term(&'a self) -> Option<(Self::Monomial, &'a Self::Coeff)>;
-        fn lead_monom(&'a self) -> Option<Self::Monomial> {
+        fn lead_term(& self) -> Option<(Self::Monomial, & Self::Coeff)>;
+        fn lead_monom(& self) -> Option<Self::Monomial> {
             self.lead_term().map(|a| a.0)
         }
-        fn lead_coeff(&'a self) -> Option<&'a Self::Coeff> {
+        fn lead_coeff(&self) -> Option<&Self::Coeff> {
             self.lead_term().map(|a| a.1)
         }
 
@@ -48,7 +48,7 @@ pub mod polynomial {
 
         fn pop_lead_term(&mut self) -> Option<(Self::Monomial, Self::Coeff)>;
 
-        fn terms(&'a self) -> BTreeMap<Self::Monomial, &'a Self::Coeff>;
+        fn terms(& self) -> BTreeMap<Self::Monomial, & Self::Coeff>;
 
         fn var(v: <Self::Monomial as Monomial>::Var) -> Option<Self> {
             match <Self::Monomial as Monomial>::var(&v) {
@@ -80,9 +80,9 @@ pub mod polynomial {
                 .fold(Self::zero(), Add::add)
         }
 
-        fn lift_map<T, F>(&'a self, map: F) -> T
+        fn lift_map<T, F>(& self, map: F) -> T
         where
-            T: Mul<Self::Coeff, Output = T> + Ring + 'a,
+            T: Mul<Self::Coeff, Output = T> + Ring,
             F: Fn(&<Self::Monomial as Monomial>::Var) -> T,
         {
             self.terms()

@@ -3,9 +3,9 @@ use ring::*;
 use scalar::*;
 use std::ops::*;
 
-pub fn buchberger<'a, P: Polynomial<'a>>(mut ideal: Vec<P>) -> Vec<P>
+pub fn buchberger<P: Polynomial>(mut ideal: Vec<P>) -> Vec<P>
 where
-    Scalar<<P as Polynomial<'a>>::Coeff> : Mul<P, Output=P>,
+    Scalar<<P as Polynomial>::Coeff> : Mul<P, Output=P>,
     P::Coeff: Field,
 {
     let mut pairs : Vec<_> = (0..ideal.len()).flat_map(move |a| (0..a).map(move |b| (a,b))).collect();

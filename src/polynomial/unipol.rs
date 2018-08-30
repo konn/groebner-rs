@@ -191,11 +191,11 @@ impl<R: Ring> IntoIterator for Unipol<R> {
     }
 }
 
-impl<'a, R: Ring + 'a> Polynomial<'a> for Unipol<R> {
+impl<R: Ring> Polynomial for Unipol<R> {
     type Monomial = Power;
     type Coeff = R;
 
-    fn lead_term(&'a self) -> Option<(Power, &'a R)> {
+    fn lead_term(&self) -> Option<(Power, & R)> {
         self.coeffs
             .iter()
             .enumerate()

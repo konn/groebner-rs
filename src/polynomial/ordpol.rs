@@ -130,7 +130,7 @@ impl<R: Ring, X: Monomial> Ring for Ordpol<R, X> {
     }
 }
 
-impl<'a, R: Ring, X: Monomial> Polynomial<'a> for Ordpol<R, X> {
+impl<R: Ring, X: Monomial> Polynomial for Ordpol<R, X> {
     type Monomial = X;
     type Coeff = R;
 
@@ -138,11 +138,11 @@ impl<'a, R: Ring, X: Monomial> Polynomial<'a> for Ordpol<R, X> {
         X::var(&v).map(|b| Ordpol([(b, R::one())].iter().cloned().collect()))
     }
 
-    fn lead_term(&'a self) -> Option<(X, &'a R)> {
+    fn lead_term(& self) -> Option<(X, & R)> {
         self.0.iter().next_back().map(|(k, v)| (k.clone(), v))
     }
 
-    fn terms(&'a self) -> BTreeMap<X, &'a R> {
+    fn terms(&self) -> BTreeMap<X, & R> {
         self.0.iter().map(move |(k, v)| (k.clone(), v)).collect()
     }
 
