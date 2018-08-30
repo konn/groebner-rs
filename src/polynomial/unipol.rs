@@ -14,7 +14,16 @@ pub struct Unipol<R> {
     coeffs: Vec<R>,
 }
 
-impl<R: Ring> Unipol<R> {
+impl<R: Zero> Unipol<R> {
+    fn normalise(self) -> Self {
+        let Unipol { coeffs } = self;
+        let mut coeffs: Vec<R> = coeffs.into_iter().rev().skip_while(Zero::is_zero).collect();
+        coeffs.reverse();
+        Unipol { coeffs }
+    }
+}
+
+impl<R: One + Zero> Unipol<R> {
     pub fn x() -> Unipol<R> {
         Unipol {
             coeffs: vec![R::zero(), R::one()],
@@ -37,7 +46,7 @@ impl<R: Zero + Clone> Add for Unipol<R> {
             .into_iter()
             .chain(iter::repeat(R::zero()).take(y_pad_len));
         let coeffs = x_pad.zip(y_pad).map(|(a, b)| a + b).collect();
-        Unipol { coeffs }
+        Unipol { coeffs }.normalise()
     }
 }
 
@@ -49,17 +58,18 @@ impl<R: One + Zero + Clone> Mul<Unipol<R>> for Scalar<R> {
         } else {
             Unipol {
                 coeffs: coeffs.into_iter().map(|r| self.0.clone() * r).collect(),
-            }
+            }.normalise()
         }
     }
 }
 
 impl<R: Ring> Neg for Unipol<R> {
     type Output = Unipol<R>;
-    fn neg(self) -> Self {
-        Unipol {
-            coeffs: self.coeffs.into_iter().map(|a| a.neg()).collect(),
+    fn neg(mut self) -> Self {
+        for i in self.coeffs.iter_mut() {
+            *i *= -R::one()
         }
+        self
     }
 }
 
@@ -83,7 +93,7 @@ impl<R: Ring> Mul for Unipol<R> {
                     .chain(rs.iter().cloned().map(|k| c.clone() * k))
                     .collect(),
             })
-            .fold(Unipol { coeffs: vec![] }, Unipol::add)
+            .fold(Unipol::zero(), Unipol::add)
     }
 }
 
@@ -107,16 +117,28 @@ impl<R: Ring> One for Unipol<R> {
 
 impl<R: Ring> Semiring for Unipol<R> {
     fn from_nat(n: usize) -> Self {
-        Unipol {
-            coeffs: vec![R::from_nat(n)],
+        if n == 0 {
+            Unipol::zero()
+        } else {
+            Unipol {
+                coeffs: vec![R::from_nat(n)],
+            }
         }
     }
 }
 
 impl<R: Ring> Ring for Unipol<R> {
     fn from_int(n: isize) -> Self {
-        Unipol {
-            coeffs: vec![R::from_int(n)],
+        if n == 0 {
+            Unipol::zero()
+        } else {
+            Unipol {
+                coeffs: vec![R::from_int(n)],
+            }
+        }
+    }
+}
+
         }
     }
 }

@@ -80,7 +80,10 @@ impl<R: One + AddAssign<R> + Zero + Clone, X: Monomial> Mul for Ordpol<R, X> {
             .flat_map(|(m, c)| {
                 other.0.clone().into_iter().map(move |(n, d)| {
                     let mut dic: BTreeMap<X, R> = BTreeMap::new();
-                    dic.entry(m.clone() * n).or_insert(c.clone() * d);
+                    let v = c.clone() * d;
+                    if !v.is_zero() {
+                        dic.entry(m.clone() * n).or_insert(v);
+                    }
                     Ordpol(dic)
                 })
             })
