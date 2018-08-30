@@ -57,6 +57,18 @@ macro_rules! new_monomial {
             #[derive(Debug, PartialEq, Eq, Clone, Copy)]
             pub struct $monom(pub [usize; $arity]);
 
+            impl PartialOrd for Var {
+                fn partial_cmp(&self, other: &Self) -> Option<_cmp::Ordering> {
+                    Some(Var::cmp(self, other))
+                }
+            }
+
+            impl Ord for Var {
+                fn cmp(&self, other: &Self) -> _cmp::Ordering {
+                    to_idx(*other).cmp(&to_idx(*self))
+                }
+            }
+
             impl Mul for $monom {
                 type Output = $monom;
                 fn mul(self, other: $monom) -> $monom {
