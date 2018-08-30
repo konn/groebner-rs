@@ -84,10 +84,24 @@ macro_rules! new_monomial {
                 }
             }
 
+            impl<'a, 'b> Mul<&'b $monom> for &'a $monom {
+                type Output = $monom;
+                fn mul(self, other: &'b $monom) -> $monom {
+                    Mul::mul(*self, *other)
+                }
+            }
+
             impl<'a> Mul<$monom> for &'a $monom {
                 type Output = $monom;
                 fn mul(self, other: $monom) -> $monom {
                     Mul::mul(*self, other)
+                }
+            }
+
+            impl<'a> Mul<&'a $monom> for $monom {
+                type Output = $monom;
+                fn mul(self, other: &'a $monom) -> $monom {
+                    Mul::mul(self, *other)
                 }
             }
 
