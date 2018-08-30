@@ -139,7 +139,55 @@ impl<R: Ring> Ring for Unipol<R> {
     }
 }
 
+pub struct Iter<'a, R: 'a> {
+    inner_iter: iter::Map<iter::Enumerate<slice::Iter<'a, R>>, fn((usize, &R)) -> (Power, &R)>,
+}
+
+impl<'a, R: 'a> Iterator for Iter<'a, R> {
+    type Item = (Power, &'a R);
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.inner_iter.next()
+    }
+}
+
+impl<'a, R: 'a> iter::FusedIterator for Iter<'a, R> {}
+impl<'a, R: 'a> iter::ExactSizeIterator for Iter<'a, R> {}
+impl<'a, R: 'a> iter::DoubleEndedIterator for Iter<'a, R> {
+    fn next_back(&mut self) -> Option<Self::Item> {
+        self.inner_iter.next_back()
+    }
+}
+
+impl<'a, R: 'a> Unipol<R> {
+    pub fn iter(&'a self) -> Iter<'a, R> {
+        Iter {
+            inner_iter: self.coeffs.iter().enumerate().map(|(a, b)| (Power(a), b)),
         }
+    }
+}
+
+impl<R: Ring> iter::FromIterator<(Power, R)> for Unipol<R> {
+    fn from_iter<T>(iter: T) -> Self
+    where
+        T: IntoIterator<Item = (Power, R)>,
+    {
+        let mut coeffs = Vec::new();
+        for (Power(i), r) in iter {
+            coeffs[i] += r
+        }
+        Unipol { coeffs }
+    }
+}
+
+impl<R: Ring> IntoIterator for Unipol<R> {
+    type Item = (Power, R);
+    type IntoIter = iter::Map<iter::Enumerate<vec::IntoIter<R>>, fn((usize, R)) -> (Power, R)>;
+    fn into_iter(self) -> Self::IntoIter {
+        self.coeffs
+            .into_iter()
+            .enumerate()
+            .map(|(a, b)| (Power(a), b))
     }
 }
 
