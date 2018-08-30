@@ -14,11 +14,6 @@ fn main() {
     let x: &Unipol<isize> = &Unipol::x();
     let f = &(x + &One::one());
     let g = &(x - &One::one());
-    let one = Unipol::<isize>::one();
-    println!("x = {:?}", x);
-    println!("(x + 1) = {:?}", f);
-    println!("(x - 1) = {:?}", x.clone() - one.clone());
-    println!("(1 - x) = {:?}", &one - x);
     println!("(x + 1)(x - 1) = {:?}", f * g);
     println!("(x + 1) ^ 2 = {:?}", f.clone().pow(2));
     println!("(x + 1)(x + 1) = {:?}", f * f);
