@@ -195,7 +195,7 @@ impl<R: Ring> Polynomial for Unipol<R> {
     type Monomial = Power;
     type Coeff = R;
 
-    fn lead_term(&self) -> Option<(Power, & R)> {
+    fn lead_term(&self) -> Option<(Power, &R)> {
         self.coeffs
             .iter()
             .enumerate()
@@ -203,8 +203,8 @@ impl<R: Ring> Polynomial for Unipol<R> {
             .map(|(a, b)| (Power(a), b))
     }
 
-    fn var(_: ()) -> Option<Self> {
-        Some(Self::x())
+    fn var(_: ()) -> Self {
+        Self::x()
     }
 
     fn terms(&self) -> BTreeMap<Power, &R> {

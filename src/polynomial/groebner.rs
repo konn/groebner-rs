@@ -34,19 +34,18 @@ where
 
 // Buchberger algorithm with coprimarity and syzygy criterion,
 // which accepts selection strategy as a weighting function.
+// This function processes critical pairs in heavier-first manner.
 pub fn buchberger_with<W: Ord, F, P: Polynomial>(calc_weight: F, mut ideal: Vec<P>) -> Vec<P>
 where
-    F: FnOnce(&P, &P) -> W + Copy,
+    F: Fn(&P, &P) -> W + Copy,
     Scalar<<P as Polynomial>::Coeff>: Mul<P, Output = P>,
     P::Coeff: Field,
 {
     let mut pairs = BinaryHeap::new();
     for i in 0..ideal.len() {
         for j in 0..i {
-            pairs.push(Entry(
-                calc_weight(&ideal[i.clone()], &ideal[j]),
-                (i, j.clone()),
-            ))
+            // Registering ciritcal pairs, with a weight for selection strategy
+            pairs.push(Entry(calc_weight(&ideal[i], &ideal[j]), (i, j)))
         }
     }
     let mut n = ideal.len();
@@ -80,8 +79,8 @@ where
         let (_, s) = f.spol(g).div_mod_polys(ideal.clone());
         if !s.is_zero() {
             ideal.push(s);
-            for i in 0..n {
-                pairs.push(Entry(calc_weight(&ideal[i], &ideal[n]), (n, i)));
+            for k in 0..n {
+                pairs.push(Entry(calc_weight(&ideal[k], &ideal[n]), (n, k)));
             }
             n += 1;
         }

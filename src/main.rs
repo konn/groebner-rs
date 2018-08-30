@@ -20,8 +20,8 @@ fn main() {
     println!("(x + 1)(x + 1) = {:?}", f * f);
     println!("(x + 1) - (x + 1) = {:?}", f - f);
 
-    let x: &Ordpol<Rational, Lex2> = &Ordpol::var(false).unwrap();
-    let y: &Ordpol<Rational, Lex2> = &Ordpol::var(true).unwrap();
+    let x: &Ordpol<Rational, Lex2> = &Ordpol::var(lex2::X);
+    let y: &Ordpol<Rational, Lex2> = &Ordpol::var(lex2::Y);
     let f = &(x + y);
     let g = &(x - y);
     println!("(x + y) = {:?}", f);
@@ -49,8 +49,8 @@ fn main() {
         p.div_mod_polys(ideal)
     );
 
-    let x: &Ordpol<Rational, Grevlex2> = &Ordpol::var(false).unwrap();
-    let y: &Ordpol<Rational, Grevlex2> = &Ordpol::var(true).unwrap();
+    let x: &Ordpol<Rational, Grevlex2> = &Ordpol::var(grevlex2::X);
+    let y: &Ordpol<Rational, Grevlex2> = &Ordpol::var(grevlex2::Y);
     let f = x * x * y - Ordpol::one();
     let g = x * x * x - y * y - x;
 

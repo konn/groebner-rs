@@ -1,5 +1,4 @@
 use num_traits::*;
-use std::cmp::Ordering;
 use std::ops::*;
 
 /// Monomial multiplicative monoid, endowed with monoidal ordering.
@@ -9,18 +8,18 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
     type Var: Copy;
 
     fn variables() -> Vec<Self::Var>;
-    fn var(var: &Self::Var) -> Option<Self>;
+    fn var(var: Self::Var) -> Self;
     fn from_exponents(exps: &[(Self::Var, usize)]) -> Self {
         exps.iter()
-            .map(|(v, i)| pow(Self::var(&v).unwrap(), *i))
+            .map(|(v, i)| pow(Self::var(*v), *i))
             .fold(Self::one(), Self::mul)
     }
-    fn exponent(&self, var: &Self::Var) -> Option<usize>;
+    fn exponent(&self, var: Self::Var) -> usize;
     fn exponents(&self) -> Vec<(Self::Var, usize)> {
         Self::variables()
             .into_iter()
             .map(|v| {
-                let c = self.exponent(&v).unwrap();
+                let c = self.exponent(v);
                 (v, c)
             })
             .collect()
@@ -74,12 +73,12 @@ impl Monomial for Power {
         vec![()]
     }
 
-    fn var(_: &()) -> Option<Self> {
-        Some(Power(1))
+    fn var(_: ()) -> Self {
+        Power(1)
     }
 
-    fn exponent(&self, (): &()) -> Option<usize> {
-        Some(self.0)
+    fn exponent(&self, _: ()) -> usize {
+        self.0
     }
 
     fn exponents(&self) -> Vec<((), usize)> {
@@ -99,142 +98,14 @@ impl Div for Power {
     }
 }
 
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub struct Lex2(pub [usize; 2]);
+new_monomial!(impl Monomial(2; X Y; lex!(2)) for Lex2 in lex2);
+new_monomial!(impl Monomial(2; X Y; grevlex!(2)) for Grevlex2 in grevlex2);
 
-impl Mul for Lex2 {
-    type Output = Self;
-    fn mul(self: Self, Lex2([x2, y2]): Self) -> Self {
-        match self {
-            Lex2([x1, y1]) => Lex2([x1 + x2, y1 + y2]),
-        }
-    }
-}
+new_monomial!(impl Monomial(3; X Y Z; lex!(3)) for Lex3 in lex3);
+new_monomial!(impl Monomial(3; X Y Z; grevlex!(3)) for Grevlex3 in grevlex3);
 
-impl PartialOrd for Lex2 {
-    fn partial_cmp(&self, Lex2([ref x2, ref y2]): &Lex2) -> Option<Ordering> {
-        let Lex2([x1, y1]) = self;
-        Some(x1.cmp(x2).then(y1.cmp(y2)))
-    }
-}
+new_monomial!(impl Monomial(4; W X Y Z; lex!(4)) for Lex4 in lex4);
+new_monomial!(impl Monomial(4; W X Y Z; grevlex!(4)) for Grevlex4 in grevlex4);
 
-impl Ord for Lex2 {
-    fn cmp(&self, other: &Lex2) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
-impl One for Lex2 {
-    fn one() -> Lex2 {
-        Lex2([0, 0])
-    }
-}
-
-impl Div for Lex2 {
-    type Output = Option<Lex2>;
-
-    fn div(self, Lex2([x2, y2]): Lex2) -> Option<Lex2> {
-        let Lex2([x1, y1]) = self;
-        if x1 >= x2 && y1 >= y2 {
-            Some(Lex2([x1 - x2, y1 - y2]))
-        } else {
-            None
-        }
-    }
-}
-
-impl Monomial for Lex2 {
-    type Var = bool;
-
-    fn variables() -> Vec<bool> {
-        vec![false, true]
-    }
-
-    fn var(b: &bool) -> Option<Lex2> {
-        Some(if *b { Lex2([0, 1]) } else { Lex2([1, 0]) })
-    }
-
-    fn exponent(&self, p: &bool) -> Option<usize> {
-        if *p {
-            Some(self.0[1])
-        } else {
-            Some(self.0[0])
-        }
-    }
-
-    fn exponents(&self) -> Vec<(bool, usize)> {
-        vec![(false, self.0[0]), (true, self.0[1])]
-    }
-}
-
-#[derive(PartialEq, Eq, Copy, Clone, Debug)]
-pub struct Grevlex2(pub [usize; 2]);
-
-impl Mul for Grevlex2 {
-    type Output = Self;
-    fn mul(self: Self, Grevlex2([x2, y2]): Self) -> Self {
-        match self {
-            Grevlex2([x1, y1]) => Grevlex2([x1 + x2, y1 + y2]),
-        }
-    }
-}
-
-impl PartialOrd for Grevlex2 {
-    fn partial_cmp(&self, Grevlex2([ref x2, ref y2]): &Grevlex2) -> Option<Ordering> {
-        let Grevlex2([x1, y1]) = self;
-        Some((x1 + y1).cmp(&(x2 + y2)).then(y2.cmp(y1).then(x2.cmp(x1))))
-    }
-}
-
-impl Ord for Grevlex2 {
-    fn cmp(&self, other: &Grevlex2) -> Ordering {
-        self.partial_cmp(other).unwrap()
-    }
-}
-
-impl One for Grevlex2 {
-    fn one() -> Grevlex2 {
-        Grevlex2([0, 0])
-    }
-}
-
-impl Div for Grevlex2 {
-    type Output = Option<Grevlex2>;
-
-    fn div(self, Grevlex2([x2, y2]): Grevlex2) -> Option<Grevlex2> {
-        let Grevlex2([x1, y1]) = self;
-        if x1 >= x2 && y1 >= y2 {
-            Some(Grevlex2([x1 - x2, y1 - y2]))
-        } else {
-            None
-        }
-    }
-}
-
-impl Monomial for Grevlex2 {
-    type Var = bool;
-
-    fn variables() -> Vec<bool> {
-        vec![false, true]
-    }
-
-    fn var(b: &bool) -> Option<Grevlex2> {
-        Some(if *b {
-            Grevlex2([0, 1])
-        } else {
-            Grevlex2([1, 0])
-        })
-    }
-
-    fn exponent(&self, p: &bool) -> Option<usize> {
-        if *p {
-            Some(self.0[1])
-        } else {
-            Some(self.0[0])
-        }
-    }
-
-    fn exponents(&self) -> Vec<(bool, usize)> {
-        vec![(false, self.0[0]), (true, self.0[1])]
-    }
-}
+new_monomial!(impl Monomial(5; V W X Y Z; lex!(5)) for Lex5 in lex5);
+new_monomial!(impl Monomial(5; V W X Y Z; grevlex!(5)) for Grevlex5 in grevlex5);

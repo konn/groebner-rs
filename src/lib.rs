@@ -59,20 +59,16 @@ pub mod polynomial {
                 .unwrap_or(0)
         }
 
-        fn var(v: <Self::Monomial as Monomial>::Var) -> Option<Self> {
-            match <Self::Monomial as Monomial>::var(&v) {
-                None => None,
-                Some(p) => Some(Self::from_terms(
-                    [(p, One::one())].iter().cloned().collect(),
-                )),
-            }
+        fn var(v: <Self::Monomial as Monomial>::Var) -> Self {
+            let p = <Self::Monomial as Monomial>::var(v);
+            Self::from_terms([(p, One::one())].iter().cloned().collect())
         }
 
         fn from_monomial(monomial: Self::Monomial) -> Self {
             monomial
                 .exponents()
                 .into_iter()
-                .map(|(v, i)| pow(Self::var(v).unwrap(), i))
+                .map(|(v, i)| pow(Self::var(v), i))
                 .fold(Self::one(), Self::mul)
         }
 
@@ -83,7 +79,7 @@ pub mod polynomial {
                     Scalar(c)
                         * m.exponents()
                             .into_iter()
-                            .map(|(v, n)| Self::var(v).unwrap().pow(n))
+                            .map(|(v, n)| Self::var(v).pow(n))
                             .fold(Self::one(), Mul::mul)
                 })
                 .fold(Self::zero(), Add::add)
@@ -99,7 +95,7 @@ pub mod polynomial {
                 .map(|(m, c)| {
                     Self::Monomial::variables()
                         .iter()
-                        .map(|v| map(v).pow(m.exponent(v).unwrap_or(0)))
+                        .map(|v| map(v).pow(m.exponent(*v)))
                         .fold(T::one(), |a, b| a * b) * (*c).clone()
                 })
                 .fold(T::zero(), |a, b| a + b)
