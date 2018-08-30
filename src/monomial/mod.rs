@@ -10,6 +10,11 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
 
     fn variables() -> Vec<Self::Var>;
     fn var(var: &Self::Var) -> Option<Self>;
+    fn from_exponents(exps: &[(Self::Var, usize)]) -> Self {
+        exps.iter()
+            .map(|(v, i)| pow(Self::var(&v).unwrap(), *i))
+            .fold(Self::one(), Self::mul)
+    }
     fn exponent(&self, var: &Self::Var) -> Option<usize>;
     fn exponents(&self) -> Vec<(Self::Var, usize)> {
         Self::variables()
