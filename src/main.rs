@@ -3,6 +3,7 @@ extern crate num_rational;
 extern crate num_traits;
 use groebner_rs::monomial::*;
 use groebner_rs::polynomial::Ordpol;
+use groebner_rs::polynomial::groebner::*;
 use groebner_rs::polynomial::Polynomial;
 use groebner_rs::polynomial::Unipol;
 use groebner_rs::ring::Semiring;
@@ -47,4 +48,11 @@ fn main() {
         "(x^2 y + x y^2 + y^2) /% (y^2 - 1, x y - 1) = {:?}",
         p.div_mod_polys(ideal)
     );
+
+    let x: &Ordpol<Rational, Grevlex2> = &Ordpol::var(false).unwrap();
+    let y: &Ordpol<Rational, Grevlex2> = &Ordpol::var(true).unwrap();
+    let f = x * x * y - Ordpol::one();
+    let g = x * x * x - y*y - x;
+
+    println!("calcGB(x^2 y - 1, x^3 - y^2 - x) = {:?}", buchberger(vec![f, g]));
 }
