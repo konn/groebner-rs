@@ -69,12 +69,22 @@ impl<T: Ring> Semiring for Scalar<T> {
     }
 }
 
+impl<T: Div<T, Output = T>> Div for Scalar<T> {
+    type Output = Scalar<T>;
+    fn div(self, otr: Scalar<T>) -> Scalar<T> {
+        Scalar(self.0 / otr.0)
+    }
+}
+
 impl<T: Ring> Ring for Scalar<T> {
     fn from_int(n: isize) -> Self {
         Scalar(T::from_int(n))
     }
 }
 
+impl<T: Field> Field for Scalar<T> {}
+
 derive_assign_with!(impl AddAssign, add_assign as Add, add for Scalar<T> where T: Ring);
 derive_assign_with!(impl SubAssign, sub_assign as Sub, sub for Scalar<T> where T: Ring);
 derive_assign_with!(impl MulAssign, mul_assign as Mul, mul for Scalar<T> where T: Ring);
+derive_assign_with!(impl DivAssign, div_assign as Div, div for Scalar<T> where T: Field);
