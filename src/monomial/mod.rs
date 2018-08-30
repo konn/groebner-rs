@@ -158,3 +158,71 @@ impl Monomial for Lex2 {
         vec![(false, self.0[0]), (true, self.0[1])]
     }
 }
+
+#[derive(PartialEq, Eq, Copy, Clone, Debug)]
+pub struct Grevlex2(pub [usize; 2]);
+
+impl Mul for Grevlex2 {
+    type Output = Self;
+    fn mul(self: Self, Grevlex2([x2, y2]): Self) -> Self {
+        match self {
+            Grevlex2([x1, y1]) => Grevlex2([x1 + x2, y1 + y2]),
+        }
+    }
+}
+
+impl PartialOrd for Grevlex2 {
+    fn partial_cmp(&self, Grevlex2([ref x2, ref y2]): &Grevlex2) -> Option<Ordering> {
+        let Grevlex2([x1, y1]) = self;
+        Some((x1+y1).cmp(&(x2 + y2)).then(y2.cmp(y1).then(x2.cmp(x1))))
+    }
+}
+
+impl Ord for Grevlex2 {
+    fn cmp(&self, other: &Grevlex2) -> Ordering {
+        self.partial_cmp(other).unwrap()
+    }
+}
+
+impl One for Grevlex2 {
+    fn one() -> Grevlex2 {
+        Grevlex2([0, 0])
+    }
+}
+
+impl Div for Grevlex2 {
+    type Output = Option<Grevlex2>;
+
+    fn div(self, Grevlex2([x2, y2]): Grevlex2) -> Option<Grevlex2> {
+        let Grevlex2([x1, y1]) = self;
+        if x1 >= x2 && y1 >= y2 {
+            Some(Grevlex2([x1 - x2, y1 - y2]))
+        } else {
+            None
+        }
+    }
+}
+
+impl Monomial for Grevlex2 {
+    type Var = bool;
+
+    fn variables() -> Vec<bool> {
+        vec![false, true]
+    }
+
+    fn var(b: &bool) -> Option<Grevlex2> {
+        Some(if *b { Grevlex2([0, 1]) } else { Grevlex2([1, 0]) })
+    }
+
+    fn exponent(&self, p: &bool) -> Option<usize> {
+        if *p {
+            Some(self.0[1])
+        } else {
+            Some(self.0[0])
+        }
+    }
+
+    fn exponents(&self) -> Vec<(bool, usize)> {
+        vec![(false, self.0[0]), (true, self.0[1])]
+    }
+}
