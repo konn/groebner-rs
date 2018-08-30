@@ -10,6 +10,20 @@ macro_rules! lift_binop_to_ref {
                 $imp::$method(self.clone(), other.clone())
             }
         }
+        impl<'a, $($bd_type: $bound,)*> $imp<&'a $t> for $t {
+            type Output = <$t as $imp>::Output;
+
+            fn $method(self, other: &$t) -> Self::Output {
+                $imp::$method(self, other.clone())
+            }
+        }
+        impl<'a, $($bd_type: $bound,)*> $imp<$t> for &'a $t {
+            type Output = <$t as $imp>::Output;
+
+            fn $method(self, other: $t) -> Self::Output {
+                $imp::$method(self.clone(), other)
+            }
+        }
     };
 }
 
