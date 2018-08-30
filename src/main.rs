@@ -40,4 +40,16 @@ fn main() {
         "(x+y)(x-y) % (x- y + 1) = {:?}",
         f * g % (g + Ordpol::one())
     );
+
+    let mut ideal = vec![x * y - Ordpol::one(), y * y - Ordpol::one()];
+    let p = x * x * y + x * y * y + y * y;
+    println!(
+        "(x^2 y + x y^2 + y^2) /% (x y - 1, y^2 - 1) = {:?}",
+        p.clone().div_mod_polys(ideal.clone())
+    );
+    ideal.reverse();
+    println!(
+        "(x^2 y + x y^2 + y^2) /% (y^2 - 1, x y - 1) = {:?}",
+        p.div_mod_polys(ideal)
+    );
 }

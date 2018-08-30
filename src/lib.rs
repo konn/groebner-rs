@@ -18,6 +18,7 @@ pub mod polynomial {
     use num_traits::*;
     use ring::*;
     use std::collections::BTreeMap;
+    use std::iter;
     use std::ops::{Add, Mul};
     use Scalar;
 
@@ -127,7 +128,7 @@ pub mod polynomial {
                         break;
                     }
                     Some(lt_f) => {
-                        let k = c.clone() / lc_f;
+                        let k = lc_f / c.clone();
                         let coe = Scalar(k) * Self::from_monomial(lt_f);
                         q += coe.clone();
                         r -= coe * g.clone();
@@ -135,6 +136,40 @@ pub mod polynomial {
                 }
             }
             (q, r)
+        }
+
+        fn div_mod_polys<I>(mut self, gs: I) -> (Vec<Self>, Self)
+        where
+            Self::Coeff: Field,
+            I: IntoIterator<Item = Self> + Clone,
+            <I as IntoIterator>::IntoIter: Clone,
+        {
+            let mut qs: Vec<Self> = iter::repeat(Self::zero())
+                .take(gs.clone().into_iter().count())
+                .collect();
+            let mut r = Self::zero();
+            let gs = gs
+                .into_iter()
+                .map(|g| {
+                    let (mls, g) = g.split_lead_term();
+                    (mls.unwrap(), g)
+                })
+                .enumerate();
+            while let Some((lt_f, lc_f)) = self.pop_lead_term() {
+                if let Some((i, d, c, g)) = gs
+                    .clone()
+                    .filter_map(|(i, ((d, c), g))| (lt_f / d).map(|t| (i, t, c, g)))
+                    .next()
+                {
+                    let k = lc_f / c;
+                    let coe = Scalar(k) * Self::from_monomial(d);
+                    qs[i] += coe.clone();
+                    self -= coe * g;
+                } else {
+                    r += Scalar(lc_f) * Self::from_monomial(lt_f);
+                }
+            }
+            (qs, r)
         }
     }
 
