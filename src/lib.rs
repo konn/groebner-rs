@@ -1,3 +1,5 @@
+extern crate num_integer;
+extern crate num_rational;
 extern crate num_traits;
 
 #[macro_use]
@@ -19,12 +21,16 @@ pub mod polynomial {
     use std::ops::{Add, Mul};
     use Scalar;
 
+    /// Trait corresponding to polynomials.
+    /// Minimal implementation: `lead_term`, `split_lead_term`, `terms`, (`var` or `from_terms`) and `lift_map`
     pub trait Polynomial<'a>: Ring
     where
         Scalar<Self::Coeff>: Mul<Self, Output = Self>,
     {
         type Monomial: Monomial;
         type Coeff: Ring;
+        // type Term: Iterator<Item = (Self::Monomial, &Self::Coeff)>;
+        // type TermMut: Iterator<(Self::Monomial, &'a mut Self::Coeff)>
 
         fn lead_term(&'a self) -> Option<(Self::Monomial, &'a Self::Coeff)>;
         fn lead_monom(&'a self) -> Option<Self::Monomial> {
@@ -33,6 +39,13 @@ pub mod polynomial {
         fn lead_coeff(&'a self) -> Option<&'a Self::Coeff> {
             self.lead_term().map(|a| a.1)
         }
+
+        fn split_lead_term(mut self) -> (Option<(Self::Monomial, Self::Coeff)>, Self) {
+            let mopt = self.pop_lead_term();
+            (mopt, self)
+        }
+
+        fn pop_lead_term(&mut self) -> Option<(Self::Monomial, Self::Coeff)>;
 
         fn terms(&'a self) -> BTreeMap<Self::Monomial, &'a Self::Coeff>;
 
@@ -44,6 +57,15 @@ pub mod polynomial {
                 )),
             }
         }
+
+        fn from_monomial(monomial: Self::Monomial) -> Self {
+            monomial
+                .exponents()
+                .into_iter()
+                .map(|(v, i)| pow(Self::var(v).unwrap(), i))
+                .fold(Self::one(), Self::mul)
+        }
+
         fn from_terms(terms: BTreeMap<Self::Monomial, Self::Coeff>) -> Self {
             terms
                 .into_iter()

@@ -142,6 +142,13 @@ impl<'a, R: Ring, X: Monomial> Polynomial<'a> for Ordpol<R, X> {
     fn terms(&'a self) -> BTreeMap<X, &'a R> {
         self.0.iter().map(move |(k, v)| (k.clone(), v)).collect()
     }
+
+    fn pop_lead_term(&mut self) -> Option<(X, R)> {
+        match self.0.keys().cloned().next_back() {
+            None => None,
+            Some(k) => self.0.remove(&k).map(|a| (k, a)),
+        }
+    }
 }
 
 lift_nums_to_ref!(impl for Ordpol<R, X> where R: Ring, X: Monomial);

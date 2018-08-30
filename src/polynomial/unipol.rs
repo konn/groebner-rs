@@ -4,9 +4,10 @@ use polynomial::Polynomial;
 use ring::*;
 use scalar::*;
 use std::collections::BTreeMap;
-use std::ops::*;
-
 use std::iter;
+use std::ops::*;
+use std::slice;
+use std::vec;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct Unipol<R> {
@@ -133,18 +134,25 @@ impl<'a, R: Ring + 'a> Polynomial<'a> for Unipol<R> {
     }
 
     fn var(_: ()) -> Option<Self> {
-        Some(Unipol {
-            coeffs: vec![R::one()],
-        })
+        Some(Self::x())
     }
 
-    fn terms(&self) -> BTreeMap<Self::Monomial, &Self::Coeff> {
+    fn terms(&self) -> BTreeMap<Power, &R> {
         self.coeffs
             .iter()
             .enumerate()
             .map(|(a, b)| (Power(a), b))
             .collect()
     }
+
+    fn pop_lead_term(&mut self) -> Option<(Power, R)> {
+        let l = self.coeffs.len();
+        match self.coeffs.pop() {
+            None => None,
+            Some(v) => Some((Power(l - 1), v)),
+        }
+    }
+}
 }
 
 lift_nums_to_ref!(impl for Unipol<R> where R: Ring);
