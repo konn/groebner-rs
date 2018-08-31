@@ -18,13 +18,45 @@ macro_rules! lex {
     };
 }
 
-macro_rules! grevlex {
+macro_rules! revlex {
+    ($e:expr) => {
+        { use std;
+          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+              for (i, j) in ys.into_iter().rev().zip(xs.into_iter().rev()) {
+                  match i.cmp(j) {
+                      std::cmp::Ordering::Equal => {
+                          continue;
+                      }
+                      ord => {
+                          return ord;
+                      }
+                  }
+              }
+              return std::cmp::Ordering::Equal;
+          }
+        }
+    };
+}
+
+macro_rules! grlex {
     ($e:expr) => {
         { use std;
           |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
               let wx : usize = xs.into_iter().sum();
               let wy : usize = ys.into_iter().sum();
               wx.cmp(&wy).then(lex!($e)(xs, ys))
+          }
+        }
+    };
+}
+
+macro_rules! grevlex {
+    ($e:expr) => {
+        { use std;
+          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+              let wx : usize = xs.into_iter().sum();
+              let wy : usize = ys.into_iter().sum();
+              wx.cmp(&wy).then(revlex!($e)(xs, ys))
           }
         }
     };
