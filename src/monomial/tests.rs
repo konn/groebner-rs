@@ -1,4 +1,3 @@
-#![allow(non_snake_case)]
 use super::*;
 use quickcheck::*;
 use std::cmp::Ordering::*;
@@ -15,7 +14,7 @@ fn positive<X: Monomial>(a: X) -> bool {
     a == X::one() || a > X::one()
 }
 
-macro_rules! quickcheck_monom {
+macro_rules! check_monom_prop {
     (@build_quick_check
          {$(($var:ident : $typ:ty))*}
          $resl:ident
@@ -25,28 +24,25 @@ macro_rules! quickcheck_monom {
     {
         quickcheck!{
             fn $fn_name($($var: $typ),*) -> $resl {
-                $test($($var),*)
+                super::$test($($var),*)
             }
         }
     };
     (@call_with_args
        ($($rests:tt)*) () $_monom:ident { $($acc:tt)* }
     ) => {
-        quickcheck_monom!{ @build_quick_check {$($acc)*} $($rests)* }
+        check_monom_prop!{ @build_quick_check {$($acc)*} $($rests)* }
     };
 
     (@call_with_args
        ($($rests:tt)*) ($var:ident $($tail:ident)*) $monom:ident { $($acc:tt)* }
     ) => {
-        quickcheck_monom!{@call_with_args ($($rests)*) ($($tail)*) $monom { $($acc)* ($var: $monom)} }
+        check_monom_prop!{@call_with_args ($($rests)*) ($($tail)*) $monom { $($acc)* ($var: $monom)} }
     };
 
-    (@build_single
-         $resl:ident
-         $test:ident($($var:ident)*)
-         for ($fn_name: ident, $monom:ident)
+    ( $fn_name:ident = $test:ident<$monom:ident>($($var:ident)*) -> $resl:ident
     ) =>
-    { quickcheck_monom!{
+    { check_monom_prop!{
         @call_with_args
             ($resl $test $fn_name)
             ($($var)*)
@@ -54,41 +50,55 @@ macro_rules! quickcheck_monom {
             {}
       }
     };
-    (@proc_list $resl:ident $test:ident($($var:ident)*) {}) => {};
+}
+
+macro_rules! check_monom {
+    (@proc_list $_monom:ident {}) => {};
     (@proc_list
-         $resl:ident
-         $test:ident($($var:ident)*)
-         { $monom:ident $($tail:tt)* }
+         $monom:ident
+         { ($test:ident($($var:ident)*) -> $resl:ident) $($tail:tt)* }
     ) => {
-        quickcheck_monom!{
-            @build_single $resl $test($($var)*) for ($monom, $monom)
+        check_monom_prop!{
+            $test = $test<$monom>($($var)*) -> $resl
         }
-        quickcheck_monom!{
-            @proc_list $resl $test($($var)*) { $($tail)*  }
+        check_monom!{
+            @proc_list $monom { $($tail)* }
         }
     };
-    ($($test:ident($($var:ident),*) -> $resl:ident for { $($prs:tt),* $(,)* })* ) => {
+    ($(
+         mod $module:ident = $monom:ident for {
+           $(fn $test:ident($($var:ident),*) -> $resl:ident);* $(;)*
+         }
+      )*
+    ) => {
         $(
-        mod $test {
+        mod $module {
             use super::*;
-            quickcheck_monom!{
-                @proc_list $resl $test($($var)*) { $($prs)* }
+            check_monom!{
+                @proc_list $monom { $(($test($($var)*) -> $resl))* }
             }
-        }
-        )*
+        })*
     };
 }
 
-quickcheck_monom!{
-    mul_resp_ord(xs, ys, zs) -> bool for {
-        Lex2, Lex3, Lex4, Lex5,
-        Grlex2, Grlex3, Grlex4, Grlex5,
-        Grevlex2, Grevlex3, Grevlex4, Grevlex5,
+check_monom!{
+    mod lex2 = Lex2 for {
+        fn mul_resp_ord(xs,ys,zs) -> bool;
+        fn positive(xs) -> bool;
     }
 
-    positive(xs) -> bool for {
-        Lex2, Lex3, Lex4, Lex5,
-        Grlex2, Grlex3, Grlex4, Grlex5,
-        Grevlex2, Grevlex3, Grevlex4, Grevlex5,
+    mod lex3 = Lex3 for {
+        fn mul_resp_ord(xs,ys,zs) -> bool;
+        fn positive(xs) -> bool;
+    }
+
+    mod lex4 = Lex4 for {
+        fn mul_resp_ord(xs,ys,zs) -> bool;
+        fn positive(xs) -> bool;
+    }
+
+    mod lex5 = Lex5 for {
+        fn mul_resp_ord(xs,ys,zs) -> bool;
+        fn positive(xs) -> bool;
     }
 }
