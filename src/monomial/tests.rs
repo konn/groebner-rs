@@ -1,4 +1,5 @@
 use super::*;
+use quickcheck::*;
 use std::cmp::Ordering::*;
 use std::iter;
 
@@ -20,6 +21,16 @@ fn var_decreasing<X: Monomial>() -> bool {
         .map(X::var)
         .chain(iter::once(X::one()));
     vars.clone().zip(vars.skip(1)).all(|(x, y)| x > y)
+}
+
+fn resp_total_deg<X: Monomial>(xs: X, ys: X) -> TestResult {
+    let deg_x = xs.total_deg();
+    let deg_y = ys.total_deg();
+    match deg_x.cmp(&deg_y) {
+        Equal => TestResult::discard(),
+        Less => TestResult::from_bool(xs < ys),
+        Greater => TestResult::from_bool(xs > ys),
+    }
 }
 
 macro_rules! check_monom_prop {
@@ -125,47 +136,55 @@ check_monom!{
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grevlex3 = Grevlex3 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grevlex4 = Grevlex4 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grevlex5 = Grevlex5 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grlex2 = Grlex2 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grlex3 = Grlex3 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grlex4 = Grlex4 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 
     mod grlex5 = Grlex5 for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;
         fn var_decreasing() -> bool;
+        fn resp_total_deg(xs, ys) -> TestResult;
     }
 }
