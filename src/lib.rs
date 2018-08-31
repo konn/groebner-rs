@@ -13,6 +13,8 @@ pub use monomial::*;
 pub use ring::*;
 pub use scalar::*;
 
+mod entry;
+
 pub mod polynomial {
     use monomial::*;
     use num_traits::*;
@@ -70,6 +72,10 @@ pub mod polynomial {
                 .into_iter()
                 .map(|(v, i)| pow(Self::var(v), i))
                 .fold(Self::one(), Self::mul)
+        }
+
+        fn from_coeff(c: Self::Coeff) -> Self {
+            Scalar(c) * Self::one()
         }
 
         fn from_terms(terms: BTreeMap<Self::Monomial, Self::Coeff>) -> Self {

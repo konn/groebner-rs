@@ -1,3 +1,4 @@
+use entry::*;
 use monomial::Monomial;
 use num_traits::One;
 use polynomial::Polynomial;
@@ -22,7 +23,7 @@ where
     cmp::Reverse(total_f.max(total_g) + lcm_fg.total_deg())
 }
 
-// Buchberger algorithm with sugar strategy, coprimarity and syzygy criterion.
+/// Buchberger algorithm with sugar strategy, coprimarity and syzygy criterion.
 #[inline]
 pub fn buchberger<P: Polynomial>(ideal: Vec<P>) -> Vec<P>
 where
@@ -32,9 +33,9 @@ where
     buchberger_with(sugar, ideal)
 }
 
-// Buchberger algorithm with coprimarity and syzygy criterion,
-// which accepts selection strategy as a weighting function.
-// This function processes critical pairs in heavier-first manner.
+/// Buchberger algorithm with coprimarity and syzygy criterion,
+/// which accepts selection strategy as a weighting function.
+/// This function processes critical pairs in heavier-first manner.
 pub fn buchberger_with<W: Ord, F, P: Polynomial>(calc_weight: F, mut ideal: Vec<P>) -> Vec<P>
 where
     F: Fn(&P, &P) -> W + Copy,
@@ -88,26 +89,5 @@ where
     ideal
 }
 
-#[derive(Debug)]
-struct Entry<L, R>(L, R);
-impl<L: PartialEq, R> PartialEq for Entry<L, R> {
-    #[inline]
-    fn eq(&self, other: &Self) -> bool {
-        self.0 == other.0
-    }
-}
-
-impl<L: Eq, R> Eq for Entry<L, R> {}
-impl<L: PartialOrd, R> PartialOrd for Entry<L, R> {
-    #[inline]
-    fn partial_cmp(&self, other: &Self) -> Option<cmp::Ordering> {
-        self.0.partial_cmp(&other.0)
-    }
-}
-
-impl<L: Ord, R> Ord for Entry<L, R> {
-    #[inline]
-    fn cmp(&self, other: &Self) -> cmp::Ordering {
-        self.0.cmp(&other.0)
-    }
-}
+pub mod signature;
+pub use self::signature::f5;

@@ -68,5 +68,10 @@ fn main() {
         - Ordpol::from_nat(420) * y * z.clone().pow(2)
         + Ordpol::from_nat(210) * y.clone().pow(2) * v - Ordpol::from_nat(25) * x * v
         + Ordpol::from_nat(70) * z * v + Ordpol::from_nat(126) * y * w;
-    println!("GB of complex polyns: {:?}", buchberger(vec![f, g]));
+    println!(
+        "GB of complex polyns: {:?}",
+        buchberger(vec![f.clone(), g.clone()])
+    );
+
+    println!("F_5 Gb of complex polyns: {:?}", f5(vec![f, g]));
 }
