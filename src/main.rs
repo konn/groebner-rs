@@ -43,19 +43,16 @@ fn main() {
 
     println!(
         "calcGB(x^2 y - 1, x^3 - y^2 - x) = {:?}",
-        buchberger(vec![f, g])
+        buchberger(vec![f.clone(), g.clone()])
     );
 
-    let vs: Vec<_> = Grevlex5::variables()
-        .into_iter()
-        .map(|a| Ordpol::<Rational, Grevlex5>::var(a))
-        .collect();
+    println!("f5(x^2 y - 1, x^3 - y^2 - x) = {:?}", f5(vec![f, g]));
 
-    let v = &vs[0];
-    let w = &vs[1];
-    let x = &vs[2];
-    let y = &vs[3];
-    let z = &vs[4];
+    let v: &Ordpol<Rational, Grevlex5> = &Ordpol::var(grevlex5::V);
+    let w: &Ordpol<Rational, Grevlex5> = &Ordpol::var(grevlex5::W);
+    let x: &Ordpol<Rational, Grevlex5> = &Ordpol::var(grevlex5::X);
+    let y: &Ordpol<Rational, Grevlex5> = &Ordpol::var(grevlex5::Y);
+    let z: &Ordpol<Rational, Grevlex5> = &Ordpol::var(grevlex5::Z);
     let f = Ordpol::from_nat(35) * y.clone().pow(4)
         - Ordpol::from_nat(30) * x * y.clone().pow(2)
         - Ordpol::from_nat(210) * y.clone().pow(2) * z

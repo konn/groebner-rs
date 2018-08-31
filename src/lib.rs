@@ -2,6 +2,12 @@ extern crate num_integer;
 extern crate num_rational;
 extern crate num_traits;
 
+#[cfg(test)]
+#[macro_use]
+extern crate quickcheck;
+#[cfg(test)]
+extern crate rand;
+
 #[macro_use]
 mod macros;
 
@@ -193,4 +199,47 @@ pub mod polynomial {
     pub mod groebner;
     pub use self::groebner::*;
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::monomial::*;
+    use super::polynomial::*;
+    use super::*;
+    use num_rational::*;
+    use num_traits::*;
+
+    #[test]
+    fn lead_term() {
+        let x: &Ordpol<Rational, Grevlex3> = &Ordpol::var(grevlex3::X);
+        let y: &Ordpol<Rational, Grevlex3> = &Ordpol::var(grevlex3::Y);
+        let z: &Ordpol<Rational, Grevlex3> = &Ordpol::var(grevlex3::Z);
+        let mon_x: &Grevlex3 = &Monomial::var(grevlex3::X);
+        let mon_y: &Grevlex3 = &Monomial::var(grevlex3::Y);
+        let mon_z: &Grevlex3 = &Monomial::var(grevlex3::Z);
+        let f = x * y * y * z + x * x * z * z + x * x * x;
+        assert_eq!(
+            f.lead_term(),
+            Some((mon_x * mon_y * mon_y * mon_z, &One::one()))
+        );
+
+        let x: &Ordpol<Rational, Lex3> = &Ordpol::var(lex3::X);
+        let y: &Ordpol<Rational, Lex3> = &Ordpol::var(lex3::Y);
+        let z: &Ordpol<Rational, Lex3> = &Ordpol::var(lex3::Z);
+        let mon_x: &Lex3 = &Monomial::var(lex3::X);
+        let f = x * y * y * z + x * x * z * z + x * x * x;
+        assert_eq!(f.lead_term(), Some((mon_x * mon_x * mon_x, &One::one())));
+
+        let x: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::X);
+        let y: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::Y);
+        let z: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::Z);
+        let f = x * y * y * z + x * x * z * z + x * x * x;
+        let mon_x: &Grlex3 = &Monomial::var(grlex3::X);
+        let mon_z: &Grlex3 = &Monomial::var(grlex3::Z);
+        let f = x * y * y * z + x * x * z * z + x * x * x;
+        assert_eq!(
+            f.lead_term(),
+            Some((mon_x * mon_x * mon_z * mon_z, &One::one()))
+        );
+    }
 }

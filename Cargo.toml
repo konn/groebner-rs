@@ -18,3 +18,7 @@ keywords = [
 "num-traits"   = "0.2.0"
 "num-rational" = "0.2.0"
 "num-integer"  = "0.1.0"
+
+[dev-dependencies]
+quickcheck     = "0.7"
+rand           = "0.5"

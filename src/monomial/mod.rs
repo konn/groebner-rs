@@ -100,12 +100,19 @@ impl Div for Power {
 
 new_monomial!(impl Monomial(2; X Y; lex!(2)) for Lex2 in lex2);
 new_monomial!(impl Monomial(2; X Y; grevlex!(2)) for Grevlex2 in grevlex2);
+new_monomial!(impl Monomial(2; X Y; grlex!(2)) for Grlex2 in grlex2);
 
 new_monomial!(impl Monomial(3; X Y Z; lex!(3)) for Lex3 in lex3);
 new_monomial!(impl Monomial(3; X Y Z; grevlex!(3)) for Grevlex3 in grevlex3);
+new_monomial!(impl Monomial(3; X Y Z; grlex!(3)) for Grlex3 in grlex3);
 
 new_monomial!(impl Monomial(4; W X Y Z; lex!(4)) for Lex4 in lex4);
 new_monomial!(impl Monomial(4; W X Y Z; grevlex!(4)) for Grevlex4 in grevlex4);
+new_monomial!(impl Monomial(4; W X Y Z; grlex!(4)) for Grlex4 in grlex4);
 
 new_monomial!(impl Monomial(5; V W X Y Z; lex!(5)) for Lex5 in lex5);
 new_monomial!(impl Monomial(5; V W X Y Z; grevlex!(5)) for Grevlex5 in grevlex5);
+new_monomial!(impl Monomial(5; V W X Y Z; grlex!(5)) for Grlex5 in grlex5);
+
+#[cfg(test)]
+mod tests;

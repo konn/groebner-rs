@@ -1,10 +1,9 @@
 macro_rules! lex {
     ($e:expr) => {
-        { use std;
-          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+          |xs: [usize; $e], ys: [usize; $e]| -> ::std::cmp::Ordering {
               for (i, j) in xs.into_iter().zip(ys.into_iter()) {
                   match i.cmp(j) {
-                      std::cmp::Ordering::Equal => {
+                      ::std::cmp::Ordering::Equal => {
                           continue;
                       }
                       ord => {
@@ -12,19 +11,17 @@ macro_rules! lex {
                       }
                   }
               }
-              return std::cmp::Ordering::Equal;
+              return ::std::cmp::Ordering::Equal;
           }
-        }
     };
 }
 
 macro_rules! revlex {
     ($e:expr) => {
-        { use std;
-          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+         |xs: [usize; $e], ys: [usize; $e]| -> ::std::cmp::Ordering {
               for (i, j) in ys.into_iter().rev().zip(xs.into_iter().rev()) {
                   match i.cmp(j) {
-                      std::cmp::Ordering::Equal => {
+                      ::std::cmp::Ordering::Equal => {
                           continue;
                       }
                       ord => {
@@ -32,47 +29,57 @@ macro_rules! revlex {
                       }
                   }
               }
-              return std::cmp::Ordering::Equal;
+              return ::std::cmp::Ordering::Equal;
           }
-        }
     };
 }
 
 macro_rules! grlex {
     ($e:expr) => {
-        { use std;
-          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+         |xs: [usize; $e], ys: [usize; $e]| -> ::std::cmp::Ordering {
               let wx : usize = xs.into_iter().sum();
               let wy : usize = ys.into_iter().sum();
               wx.cmp(&wy).then(lex!($e)(xs, ys))
-          }
-        }
+         }
+        
     };
 }
 
 macro_rules! grevlex {
     ($e:expr) => {
-        { use std;
-          |xs: [usize; $e], ys: [usize; $e]| -> std::cmp::Ordering {
+          |xs: [usize; $e], ys: [usize; $e]| -> ::std::cmp::Ordering {
               let wx : usize = xs.into_iter().sum();
               let wy : usize = ys.into_iter().sum();
               wx.cmp(&wy).then(revlex!($e)(xs, ys))
           }
-        }
     };
 }
 
 macro_rules! new_monomial {
     (impl Monomial($arity:expr; $($var:ident)+; $cmp:expr)for $monom:ident in $mod:ident) => {
         pub mod $mod {
-            use num_traits::*;
-            use std::cmp as _cmp;
-            use std::ops::*;
-            use monomial;
+            use ::num_traits::*;
+            use ::std::cmp as _cmp;
+            use ::std::ops::*;
+            use $crate::monomial;
+
+            #[cfg(test)]
+            use ::quickcheck::Arbitrary;
+            #[cfg(test)]
+            use ::quickcheck::Gen;
+            #[cfg(test)]
+            use ::rand::Rng;
 
             #[derive(Debug, PartialEq, Eq, Clone, Copy)]
             pub enum Var {
                 $($var,)*
+            }
+
+            #[cfg(test)]
+            impl Arbitrary for Var {
+                fn arbitrary<G: Gen>(g: &mut G) -> Var {
+                    *g.choose(&[$($var,)*]).unwrap()
+                }
             }
 
             fn to_idx(v: Var) -> usize {
@@ -88,6 +95,23 @@ macro_rules! new_monomial {
 
             #[derive(Debug, PartialEq, Eq, Clone, Copy)]
             pub struct $monom(pub [usize; $arity]);
+
+            #[cfg(test)]
+            impl Arbitrary for $monom {
+                fn arbitrary<G: Gen>(g: &mut G) -> $monom {
+                    let mut arr = [0; $arity];
+                    let mut vec: Vec<_> = ::std::iter::repeat(0).take($arity).collect();
+                    for i in 0..$arity {
+                        vec[i] = g.gen_range(0, ::std::usize::MAX / ((1 + $arity) * 2));
+                    }
+                    arr.copy_from_slice(&vec[..$arity]);
+                    $monom(arr)
+                }
+
+                fn shrink(&self) -> Box<Iterator<Item = $monom>> {
+                    unimplemented!()
+                }
+            }
 
             impl PartialOrd for Var {
                 fn partial_cmp(&self, other: &Self) -> Option<_cmp::Ordering> {
