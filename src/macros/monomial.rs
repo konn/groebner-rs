@@ -107,10 +107,6 @@ macro_rules! new_monomial {
                     arr.copy_from_slice(&vec[..$arity]);
                     $monom(arr)
                 }
-
-                fn shrink(&self) -> Box<Iterator<Item = $monom>> {
-                    unimplemented!()
-                }
             }
 
             impl PartialOrd for Var {

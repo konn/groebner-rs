@@ -1,12 +1,18 @@
 use num_traits::*;
 use std::ops::*;
 
+#[cfg(test)]
+use quickcheck::*;
+#[cfg(test)]
+use rand::Rng;
+
 /// Monomial multiplicative monoid, endowed with monoidal ordering.
 /// A type must satisfy the axioms of ordered free commutative monoids;
 /// I.e. a * b = b * a, a * (b * c) = (a * b) * c, 1 <= a, and "a <= b implies a * c <= b * c".
 pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
     type Var: Copy;
 
+    /// Returns the list of variables, in decreasing order;
     fn variables() -> Vec<Self::Var>;
     fn var(var: Self::Var) -> Self;
     fn from_exponents(exps: &[(Self::Var, usize)]) -> Self {
@@ -15,6 +21,8 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
             .fold(Self::one(), Self::mul)
     }
     fn exponent(&self, var: Self::Var) -> usize;
+
+    /// Returns the list of pairs of variable and exponents, in variable decreasing order;
     fn exponents(&self) -> Vec<(Self::Var, usize)> {
         Self::variables()
             .into_iter()
@@ -44,8 +52,15 @@ pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
     }
 }
 
-#[derive(Eq, PartialEq, Ord, PartialOrd, Copy, Clone)]
+#[derive(Eq, PartialEq, Ord, PartialOrd, Copy, Clone, Debug)]
 pub struct Power(pub usize);
+
+#[cfg(test)]
+impl Arbitrary for Power {
+    fn arbitrary<G: Gen>(g: &mut G) -> Power {
+        Power(g.gen_range(0, ::std::usize::MAX / 3))
+    }
+}
 
 impl Mul for Power {
     type Output = Power;
