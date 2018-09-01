@@ -56,7 +56,7 @@ macro_rules! grevlex {
 }
 
 macro_rules! new_monomial {
-    (impl Monomial($arity:expr; $($var:ident)+; $cmp:expr)for $monom:ident in $mod:ident) => {
+    (@impl_monom ($($var:ident)*) ($($vecs:expr);*) ($cmp:expr) $monom:ident $mod:ident) => {
         pub mod $mod {
             use ::num_traits::*;
             use ::std::cmp as _cmp;
@@ -78,33 +78,39 @@ macro_rules! new_monomial {
             #[cfg(test)]
             impl Arbitrary for Var {
                 fn arbitrary<G: Gen>(g: &mut G) -> Var {
-                    *g.choose(&[$($var,)*]).unwrap()
+                    *g.choose(&[$($var),*]).unwrap()
                 }
-            }
-
-            fn to_idx(v: Var) -> usize {
-                let mut n = 0;
-                $(
-                if let Var::$var = v {
-                    return n
-                }
-                n += 1;
-                )*;
-                return n;
             }
 
             #[derive(Debug, PartialEq, Eq, Clone, Copy)]
-            pub struct $monom(pub [usize; $arity]);
+            pub struct $monom(pub [usize; $monom::VAR_COUNT]);
+
+            impl $monom {
+                pub const VAR_COUNT : usize = new_monomial!(@count_vars $($var)*);
+                fn to_index(v: Var) -> usize {
+                    let mut n = 0;
+                    $(
+                    if let Var::$var = v {
+                        return n
+                    }
+                    n += 1;
+                    )*;
+                    return n;
+                }
+                $(
+                pub const $var: $monom = $monom($vecs);
+                )*
+            }
 
             #[cfg(test)]
             impl Arbitrary for $monom {
                 fn arbitrary<G: Gen>(g: &mut G) -> $monom {
-                    let mut arr = [0; $arity];
-                    let mut vec: Vec<_> = ::std::iter::repeat(0).take($arity).collect();
-                    for i in 0..$arity {
-                        vec[i] = g.gen_range(0, ::std::usize::MAX / ((1 + $arity) * 2));
+                    let mut arr = [0; $monom::VAR_COUNT];
+                    let mut vec: Vec<_> = ::std::iter::repeat(0).take($monom::VAR_COUNT).collect();
+                    for i in 0..$monom::VAR_COUNT {
+                        vec[i] = g.gen_range(0, ::std::usize::MAX / ((1 + $monom::VAR_COUNT) * 2));
                     }
-                    arr.copy_from_slice(&vec[..$arity]);
+                    arr.copy_from_slice(&vec[..$monom::VAR_COUNT]);
                     $monom(arr)
                 }
             }
@@ -117,21 +123,21 @@ macro_rules! new_monomial {
 
             impl Ord for Var {
                 fn cmp(&self, other: &Self) -> _cmp::Ordering {
-                    to_idx(*other).cmp(&to_idx(*self))
+                    $monom::to_index(*other).cmp(&$monom::to_index(*self))
                 }
             }
 
             impl Mul for $monom {
                 type Output = $monom;
                 fn mul(self, other: $monom) -> $monom {
-                    let mut arr = [0; $arity];
+                    let mut arr = [0; $monom::VAR_COUNT];
                     let vec: Vec<_> = self
                         .0
                         .into_iter()
                         .zip(other.0.into_iter())
                         .map(|(a, b)| a + b)
                         .collect();
-                    arr.copy_from_slice(&vec[..$arity]);
+                    arr.copy_from_slice(&vec[..$monom::VAR_COUNT]);
                     $monom(arr)
                 }
             }
@@ -159,7 +165,7 @@ macro_rules! new_monomial {
 
             impl One for $monom {
                 fn one() -> $monom {
-                    $monom([0; $arity])
+                    $monom([0; $monom::VAR_COUNT])
                 }
             }
 
@@ -168,12 +174,12 @@ macro_rules! new_monomial {
 
                 fn div(self, other: $monom) -> Option<$monom> {
                     if self.0.iter().zip(other.0.iter()).all(|(i, j)| i >= j) {
-                        let mut arr = [0 ; $arity];
+                        let mut arr = [0 ; $monom::VAR_COUNT];
                         let vec: Vec<_> =
                             self.0.into_iter()
                                 .zip(other.0.into_iter())
                                 .map(|(i, j)| i - j).collect();
-                        arr.copy_from_slice(&vec[..$arity]);
+                        arr.copy_from_slice(&vec[..$monom::VAR_COUNT]);
                         Some($monom(arr))
                     } else {
                         None
@@ -201,13 +207,13 @@ macro_rules! new_monomial {
                 }
 
                 fn var(v: Var) -> Self {
-                    let mut arr = [0 ; $arity];
-                    arr[to_idx(v)] = 1;
-                    $monom(arr)
+                    match v {
+                        $($var => $monom::$var,)*
+                    }
                 }
 
                 fn exponent(&self, v: Var) -> usize {
-                    self.0[to_idx(v)]
+                    self.0[$monom::to_index(v)]
                 }
 
                 fn exponents(&self) -> Vec<(Var, usize)> {
@@ -217,6 +223,43 @@ macro_rules! new_monomial {
             pub use self::Var::{$($var,)*};
 
         }
-        pub use $mod::$monom;
+        pub use self::$mod::$monom;
+    };
+    (@build_vars_rec
+        ()
+        ($($v:ident)*)
+        [$($_d:expr),*]
+        ($([$($entry:expr),* ]);* $(;)*)
+        ($cmp:expr) $monom:ident $mod:ident
+    ) => {
+        new_monomial!{
+            @impl_monom ($($v)*) ($([$($entry),*]);*) ($cmp) $monom $mod
+        }
+    };
+    (@build_vars_rec
+       ($v:ident $($tail:ident)*)          // Vars to be processed
+       ($($vars:ident)*)                   // Processed vars
+       [$($d:expr),*]                        // Current prefix
+       ($([$($entry:expr),*]);*)            // Accumulated results
+       ($cmp:expr) $monom:ident $mod:ident // Continuation
+    ) => {
+        new_monomial!{ 
+          @build_vars_rec
+             ($($tail)*)
+             ($($vars)* $v)
+             [$($d,)* 0]
+             ($([$($entry,)* 0];)* [$($d,)* 1]) ($cmp) $monom $mod
+        }
+    };
+    (@impl_with_vars ($($v:ident)*) ($cmp:expr) $monom:ident $mod:ident) => {
+        new_monomial!{ @build_vars_rec ($($v)*) () [] () ($cmp) $monom $mod }
+    };
+    (@count_vars) => { 0usize };
+    (@count_vars $v:ident $($rest:tt)*) => {1usize + new_monomial!(@count_vars $($rest)*) };
+    (impl Monomial($($var:ident),*; $cmp:ident!) for $monom:ident in $mod:ident) => {
+        new_monomial!{impl Monomial($($var),*; $cmp!($monom::VAR_COUNT))for $monom in $mod}
+    };
+    (impl Monomial($($var:ident),*; $cmp:expr) for $monom:ident in $mod:ident) => {
+        new_monomial!{ @impl_with_vars ($($var)*) ($cmp) $monom $mod }
     };
 }
