@@ -10,7 +10,7 @@ use rand::Rng;
 /// A type must satisfy the axioms of ordered free commutative monoids;
 /// I.e. a * b = b * a, a * (b * c) = (a * b) * c, 1 <= a, and "a <= b implies a * c <= b * c".
 pub trait Monomial: Div<Self, Output = Option<Self>> + Ord + One + Copy {
-    type Var: Copy;
+    type Var: Copy + PartialEq + Eq + Ord;
 
     /// Returns the list of variables, in decreasing order;
     fn variables() -> Vec<Self::Var>;
