@@ -14,10 +14,12 @@ build:
 
 test:
   stage: test
+  image: xd009642/tarpaulin
   dependencies:
   - build
   script:
-  - cargo test
+  - cargo tarpaulin
+  coverage: '/^\s*(\d+\s*%)\s*coverage/'
   cache: 
     paths: 
     - target/
