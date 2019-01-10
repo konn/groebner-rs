@@ -1,0 +1,18 @@
+image: rust:1.31.1
+
+build:
+  stage: build
+  script:
+  - cargo build
+  - cargo build --release
+  cache:
+    paths:
+    - target
+
+test:
+  stage: test
+  dependencies:
+  - build
+  script:
+  - cargo test
+  
