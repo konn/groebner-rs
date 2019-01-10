@@ -18,7 +18,7 @@ test:
   dependencies:
   - build
   script:
-  - cargo tarpaulin
+  - cargo tarpaulin -v
   coverage: '/^\s*(\d+\s*%)\s*coverage/'
   cache: 
     paths: 
