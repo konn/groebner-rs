@@ -1,8 +1,8 @@
-use monomial::*;
+use crate::monomial::*;
 use num_traits::*;
-use polynomial::Polynomial;
-use ring::*;
-use scalar::*;
+use crate::polynomial::Polynomial;
+use crate::ring::*;
+use crate::scalar::*;
 use std::collections::btree_map as btm;
 use std::collections::BTreeMap;
 use std::ops::*;

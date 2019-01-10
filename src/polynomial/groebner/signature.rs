@@ -1,8 +1,8 @@
-use entry::*;
-use monomial::Monomial;
-use polynomial::Polynomial;
-use ring::*;
-use scalar::*;
+use crate::entry::*;
+use crate::monomial::Monomial;
+use crate::polynomial::Polynomial;
+use crate::ring::*;
+use crate::scalar::*;
 
 use num_traits::*;
 use std::cmp::Ordering;

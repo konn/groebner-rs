@@ -1,9 +1,9 @@
-use entry::*;
-use monomial::Monomial;
+use crate::entry::*;
+use crate::monomial::Monomial;
 use num_traits::One;
-use polynomial::Polynomial;
-use ring::*;
-use scalar::*;
+use crate::polynomial::Polynomial;
+use crate::ring::*;
+use crate::scalar::*;
 use std::cmp;
 use std::collections::BinaryHeap;
 use std::ops::*;

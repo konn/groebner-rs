@@ -1,13 +1,3 @@
-extern crate num_integer;
-extern crate num_rational;
-extern crate num_traits;
-
-#[cfg(test)]
-#[macro_use]
-extern crate quickcheck;
-#[cfg(test)]
-extern crate rand;
-
 #[macro_use]
 mod macros;
 
@@ -15,20 +5,20 @@ pub mod monomial;
 pub mod ring;
 pub mod scalar;
 
-pub use monomial::*;
-pub use ring::*;
-pub use scalar::*;
+pub use crate::monomial::*;
+pub use crate::ring::*;
+pub use crate::scalar::*;
 
 mod entry;
 
 pub mod polynomial {
-    use monomial::*;
+    use crate::monomial::*;
+    use crate::ring::*;
+    use crate::Scalar;
     use num_traits::*;
-    use ring::*;
     use std::collections::BTreeMap;
     use std::iter;
     use std::ops::{Add, Mul};
-    use Scalar;
 
     /// Trait corresponding to polynomials.
     /// Minimal implementation: `lead_term`, `split_lead_term`, `terms`, (`var` or `from_terms`) and `lift_map`
@@ -108,7 +98,8 @@ pub mod polynomial {
                     Self::Monomial::variables()
                         .iter()
                         .map(|v| map(v).pow(m.exponent(*v)))
-                        .fold(T::one(), |a, b| a * b) * (*c).clone()
+                        .fold(T::one(), |a, b| a * b)
+                        * (*c).clone()
                 })
                 .fold(T::zero(), |a, b| a + b)
         }
@@ -233,7 +224,7 @@ mod tests {
         let x: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::X);
         let y: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::Y);
         let z: &Ordpol<Rational, Grlex3> = &Ordpol::var(grlex3::Z);
-        let f = x * y * y * z + x * x * z * z + x * x * x;
+        let _f = x * y * y * z + x * x * z * z + x * x * x;
         let mon_x: &Grlex3 = &Monomial::var(grlex3::X);
         let mon_z: &Grlex3 = &Monomial::var(grlex3::Z);
         let f = x * y * y * z + x * x * z * z + x * x * x;

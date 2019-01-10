@@ -1,5 +1,6 @@
 [package]
 name = "groebner-rs"
+edition = "2018"
 version = "0.1.0"
 authors = ["Hiromi ISHII <konn.jinro@gmail.com>"]
 description = "Computer algebra algorithms, mainly focusing on Groebner basis, implemented in Rust"

@@ -19,3 +19,12 @@
 Cargo.lock
 
 
+### https://raw.github.com/github/gitignore/2a40ae6a381bfe56eed1b32833b5662cc463dbf0/Global/VisualStudioCode.gitignore
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+

@@ -1,5 +1,5 @@
 use num_traits::*;
-use ring::*;
+use crate::ring::*;
 use std::ops::*;
 
 #[derive(Debug, Clone, Ord, Eq, PartialOrd, PartialEq)]

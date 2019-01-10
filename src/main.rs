@@ -1,6 +1,3 @@
-extern crate groebner_rs;
-extern crate num_rational;
-extern crate num_traits;
 use groebner_rs::monomial::*;
 use groebner_rs::polynomial::groebner::*;
 use groebner_rs::polynomial::Ordpol;
