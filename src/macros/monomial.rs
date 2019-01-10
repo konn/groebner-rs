@@ -87,7 +87,7 @@ macro_rules! new_monomial {
 
             impl $monom {
                 pub const VAR_COUNT : usize = new_monomial!(@count_vars $($var)*);
-                fn to_index(v: Var) -> usize {
+                fn calc_index(v: Var) -> usize {
                     let mut n = 0;
                     $(
                     if let Var::$var = v {
@@ -123,7 +123,7 @@ macro_rules! new_monomial {
 
             impl Ord for Var {
                 fn cmp(&self, other: &Self) -> _cmp::Ordering {
-                    $monom::to_index(*other).cmp(&$monom::to_index(*self))
+                    $monom::calc_index(*other).cmp(&$monom::calc_index(*self))
                 }
             }
 
@@ -214,7 +214,7 @@ macro_rules! new_monomial {
                 }
 
                 fn exponent(&self, v: Var) -> usize {
-                    self.0[$monom::to_index(v)]
+                    self.0[$monom::calc_index(v)]
                 }
 
                 fn exponents(&self) -> Vec<(Var, usize)> {

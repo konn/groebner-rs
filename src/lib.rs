@@ -20,6 +20,8 @@ pub mod polynomial {
     use std::iter;
     use std::ops::{Add, Mul};
 
+    pub type Term<A> = (<A as Polynomial>::Monomial, <A as Polynomial>::Coeff);
+
     /// Trait corresponding to polynomials.
     /// Minimal implementation: `lead_term`, `split_lead_term`, `terms`, (`var` or `from_terms`) and `lift_map`
     pub trait Polynomial: Ring
@@ -39,12 +41,12 @@ pub mod polynomial {
             self.lead_term().map(|a| a.1)
         }
 
-        fn split_lead_term(mut self) -> (Option<(Self::Monomial, Self::Coeff)>, Self) {
+        fn split_lead_term(mut self) -> (Option<Term<Self>>, Self) {
             let mopt = self.pop_lead_term();
             (mopt, self)
         }
 
-        fn pop_lead_term(&mut self) -> Option<(Self::Monomial, Self::Coeff)>;
+        fn pop_lead_term(&mut self) -> Option<Term<Self>>;
 
         fn terms(&self) -> BTreeMap<Self::Monomial, &Self::Coeff>;
 
@@ -112,7 +114,7 @@ pub mod polynomial {
             let (mx, cx) = mcx.unwrap();
             let (mcy, g) = other.split_lead_term();
             let (my, cy) = mcy.unwrap();
-            let m = mx.clone().lcm(my.clone());
+            let m = mx.lcm(my);
             let mx: Self::Monomial = (m / mx).unwrap();
             let my: Self::Monomial = (m / my).unwrap();
             let f = Scalar(cx.clone().recip()) * Self::from_monomial(mx) * f;

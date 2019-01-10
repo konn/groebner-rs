@@ -1,5 +1,4 @@
 use super::*;
-use quickcheck::*;
 use std::cmp::Ordering::*;
 use std::iter;
 
@@ -124,7 +123,7 @@ macro_rules! check_monom {
     };
 }
 
-check_monom!{
+check_monom! {
     mod power = Power for {
         fn mul_resp_ord(xs,ys,zs) -> bool;
         fn positive(xs) -> bool;

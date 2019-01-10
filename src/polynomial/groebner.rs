@@ -1,9 +1,9 @@
 use crate::entry::*;
 use crate::monomial::Monomial;
-use num_traits::One;
 use crate::polynomial::Polynomial;
 use crate::ring::*;
 use crate::scalar::*;
+use num_traits::One;
 use std::cmp;
 use std::collections::BinaryHeap;
 use std::ops::*;
@@ -15,8 +15,8 @@ where
     P: Polynomial,
     Scalar<<P as Polynomial>::Coeff>: Mul<P, Output = P>,
 {
-    let lm_f = f.lead_monom().unwrap_or(One::one());
-    let lm_g = g.lead_monom().unwrap_or(One::one());
+    let lm_f = f.lead_monom().unwrap_or_else(One::one);
+    let lm_g = g.lead_monom().unwrap_or_else(One::one);
     let lcm_fg = lm_f.lcm(lm_g);
     let total_f = f.total_deg() - lm_f.total_deg();
     let total_g = g.total_deg() - lm_g.total_deg();
