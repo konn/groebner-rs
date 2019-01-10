@@ -1,5 +1,6 @@
 #![allow(unknown_lints)]
 #![allow(unused_macros)]
+#![allow(clippy::suspicous_arithmetic_impl)]
 
 macro_rules! lift_binop_to_ref {
     (impl $imp:ident, $method:ident for $t:ty where $($bd_type:ident : $bound:tt),*) => {

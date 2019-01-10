@@ -53,15 +53,20 @@ fn main() {
     let f = Ordpol::from_nat(35) * y.clone().pow(4)
         - Ordpol::from_nat(30) * x * y.clone().pow(2)
         - Ordpol::from_nat(210) * y.clone().pow(2) * z
-        + Ordpol::from_nat(3) * x.clone().pow(2) + Ordpol::from_nat(30) * x * z
-        - Ordpol::from_nat(105) * z.clone().pow(2) + Ordpol::from_nat(140) * y * v
+        + Ordpol::from_nat(3) * x.clone().pow(2)
+        + Ordpol::from_nat(30) * x * z
+        - Ordpol::from_nat(105) * z.clone().pow(2)
+        + Ordpol::from_nat(140) * y * v
         - Ordpol::from_nat(21) * w;
     let g = Ordpol::from_nat(5) * x * y.clone().pow(3)
         - Ordpol::from_nat(140) * y.clone().pow(3) * z
-        - Ordpol::from_nat(3) * x.clone().pow(2) * y + Ordpol::from_nat(45) * x * y * z
+        - Ordpol::from_nat(3) * x.clone().pow(2) * y
+        + Ordpol::from_nat(45) * x * y * z
         - Ordpol::from_nat(420) * y * z.clone().pow(2)
-        + Ordpol::from_nat(210) * y.clone().pow(2) * v - Ordpol::from_nat(25) * x * v
-        + Ordpol::from_nat(70) * z * v + Ordpol::from_nat(126) * y * w;
+        + Ordpol::from_nat(210) * y.clone().pow(2) * v
+        - Ordpol::from_nat(25) * x * v
+        + Ordpol::from_nat(70) * z * v
+        + Ordpol::from_nat(126) * y * w;
     println!(
         "GB of complex polyns: {:?}",
         buchberger(vec![f.clone(), g.clone()])

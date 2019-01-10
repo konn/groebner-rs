@@ -41,7 +41,7 @@ macro_rules! grlex {
               let wy : usize = ys.into_iter().sum();
               wx.cmp(&wy).then(lex!($e)(xs, ys))
          }
-        
+
     };
 }
 
@@ -129,6 +129,7 @@ macro_rules! new_monomial {
 
             impl Mul for $monom {
                 type Output = $monom;
+                #[allow(clippy::suspicious_arithmetic_impl)]
                 fn mul(self, other: $monom) -> $monom {
                     let mut arr = [0; $monom::VAR_COUNT];
                     let vec: Vec<_> = self
@@ -171,7 +172,7 @@ macro_rules! new_monomial {
 
             impl Div for $monom {
                 type Output = Option<$monom>;
-
+                #[allow(clippy::suspicious_arithmetic_impl)]
                 fn div(self, other: $monom) -> Option<$monom> {
                     if self.0.iter().zip(other.0.iter()).all(|(i, j)| i >= j) {
                         let mut arr = [0 ; $monom::VAR_COUNT];
@@ -243,7 +244,7 @@ macro_rules! new_monomial {
        ($([$($entry:expr),*]);*)            // Accumulated results
        ($cmp:expr) $monom:ident $mod:ident // Continuation
     ) => {
-        new_monomial!{ 
+        new_monomial!{
           @build_vars_rec
              ($($tail)*)
              ($($vars)* $v)

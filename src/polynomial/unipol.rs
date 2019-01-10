@@ -1,8 +1,8 @@
 use crate::monomial::*;
-use num_traits::*;
 use crate::polynomial::Polynomial;
 use crate::ring::*;
 use crate::scalar::*;
+use num_traits::*;
 use std::collections::BTreeMap;
 use std::iter;
 use std::ops::*;
@@ -33,6 +33,7 @@ impl<R: One + Zero> Unipol<R> {
 
 impl<R: Zero + Clone> Add for Unipol<R> {
     type Output = Unipol<R>;
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn add(self, other: Self) -> Self {
         let len = self.coeffs.len().max(other.coeffs.len());
         let x_pad_len = len - self.coeffs.len();
@@ -58,7 +59,8 @@ impl<R: One + Zero + Clone> Mul<Unipol<R>> for Scalar<R> {
         } else {
             Unipol {
                 coeffs: coeffs.into_iter().map(|r| self.0.clone() * r).collect(),
-            }.normalise()
+            }
+            .normalise()
         }
     }
 }
@@ -75,6 +77,7 @@ impl<R: Ring> Neg for Unipol<R> {
 
 impl<R: Ring> Sub for Unipol<R> {
     type Output = Unipol<R>;
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn sub(self, other: Unipol<R>) -> Self {
         self + other.neg()
     }

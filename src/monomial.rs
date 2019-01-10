@@ -64,6 +64,7 @@ impl Arbitrary for Power {
 
 impl Mul for Power {
     type Output = Power;
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn mul(self: Power, Power(b): Power) -> Power {
         match self {
             Power(a) => Power(a + b),
@@ -103,7 +104,7 @@ impl Monomial for Power {
 
 impl Div for Power {
     type Output = Option<Self>;
-
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn div(self, other: Power) -> Option<Self> {
         if self.0 < other.0 {
             None

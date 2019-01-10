@@ -1,8 +1,8 @@
 use crate::monomial::*;
-use num_traits::*;
 use crate::polynomial::Polynomial;
 use crate::ring::*;
 use crate::scalar::*;
+use num_traits::*;
 use std::collections::btree_map as btm;
 use std::collections::BTreeMap;
 use std::ops::*;
@@ -106,6 +106,7 @@ impl<R: Neg<Output = R> + One + Zero + Clone, X: Monomial> Neg for Ordpol<R, X> 
 
 impl<R: Ring, X: Monomial> Sub for Ordpol<R, X> {
     type Output = Ordpol<R, X>;
+    #[allow(clippy::suspicious_arithmetic_impl)]
     fn sub(self, other: Ordpol<R, X>) -> Self {
         self + other.neg()
     }
