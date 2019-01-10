@@ -19,7 +19,7 @@ test:
   - build
   script:
   - cargo tarpaulin -v
-  coverage: '/^\s*(\d+\s*%)\s*coverage/'
+  coverage: '/^\s*(\d+(\.\d+)?\s*%)\s*coverage/'
   cache: 
     paths: 
     - target/
